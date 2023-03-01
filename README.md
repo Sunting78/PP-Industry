@@ -36,37 +36,37 @@ The overall directory structure of PaddleOCR is introduced as follows:
 PaddleIndustry
 ├── configs                                 // Configuration file, you can config the model structure and modify the hyperparameters through the yml file
 │   ├── det                                 // Defect detection config files
-│   │   ├── faster_rcnn.yml                  // Training config
+│   │   ├── faster_rcnn.yml                 // Training config
 │   │   ...  
 │   └── seg                                 // defect segmentation config files
-│       ├── hrnet_ocr.yml     // hrnet config
+│       ├── hrnet_ocr.yml                   // hrnet config
 │       ...  
 ├── deploy                                  // Depoly
 |   ...                                
 ├── doc                                     // Documentation and Tutorials
 │   ...
-├── ppindustry                               // Core code
+├── ppindustry                              // Core code
 │   ├── det                                 // detection code
 │   │   ├── datasets                        // defect data loder code
-│   │   ├── transforms                     // defect data augmentation
+│   │   ├── transforms                      // defect data augmentation
 │   │   └── models                          // defect models
-│   ├── seg                             // Metrics
+│   ├── seg                                 // Segmentation
 │   │   ├── datasets                        // defect data loder code
-│   │   ├── transforms                     // defect data augmentation
+│   │   ├── transforms                      // defect data augmentation
 │   │   └── models                          // defect models
 │   ├── postprocess                         // Post-processing
 │   │   ├── det_postprocess.py              // class post-processing
-│   │   └── seg_postprocess.py               // DB post-processing
+│   │   └── seg_postprocess.py              // DB post-processing
 │   └── utils                               // utils
 ├── tools
-│   ├── end2end.py                           // Evaluation function end-to-end
+│   ├── end2end.py                          // Evaluation function end-to-end
 │   ├── export_model.py                     // Export inference model
-│   ├── det                                // Detection train predict and inference 
+│   ├── det                                 // Detection train predict and inference 
 │   │   ├── train.py
 │   │   ├── eval.py
 │   │   ├── infer.py
 |   |   ...
-│   ├── seg                                // Segmentation train predict and inference 
+│   ├── seg                                 // Segmentation train predict and inference 
 │   │   ├── train.py
 │   │   ├── eval.py
 │   │   ├── infer.py
@@ -74,4 +74,4 @@ PaddleIndustry
 ├── README_ch.md                            // Chinese documentation
 ├── README_en.md                            // English documentation
 ├── README.md                               // Home page documentation
-├── requirements.txt                         // Requirements
+├── requirements.txt                        // Requirements
