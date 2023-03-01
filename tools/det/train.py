@@ -20,8 +20,9 @@ import os
 import sys
 
 # add python path of PaddleDetection to sys.path
-parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 2)))
+parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 3)))
 sys.path.insert(0, parent_path)
+from ppindustry import *
 
 # ignore warning log
 import warnings
