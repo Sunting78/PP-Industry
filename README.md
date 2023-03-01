@@ -22,6 +22,7 @@ PaddleIndustry aims to create multilingual, awesome, leading, and practical indu
   ```
 
 * Detection and RoI Segmentation
+  
   First, deal with your data to generate coco.json format and RoI segmentation mask format.
 
   ```bash
