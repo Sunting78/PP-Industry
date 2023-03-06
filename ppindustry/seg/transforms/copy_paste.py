@@ -1,9 +1,11 @@
 import random
 import math
+import copy
 
 import cv2
 import numpy as np
 from PIL import Image
+from shapely.geometry import Polygon
 
 from paddleseg.cvlibs import manager
 from paddleseg.transforms import functional
@@ -36,20 +38,59 @@ class CopyPaste:
         self.memory_bank = []
 
     def update_mem(self, data):
-        
         pass
-        
-    def copy_and_paste(self,data):
+
+    def intersection(g, p):
+        """
+        Intersection.
+        """
+
+        g = g[:8].reshape((4, 2))
+        p = p[:8].reshape((4, 2))
+
+        a = g
+        b = p
+
+        use_filter = True
+        if use_filter:
+            # step1:
+            inter_x1 = np.maximum(np.min(a[:, 0]), np.min(b[:, 0]))
+            inter_x2 = np.minimum(np.max(a[:, 0]), np.max(b[:, 0]))
+            inter_y1 = np.maximum(np.min(a[:, 1]), np.min(b[:, 1]))
+            inter_y2 = np.minimum(np.max(a[:, 1]), np.max(b[:, 1]))
+            if inter_x1 >= inter_x2 or inter_y1 >= inter_y2:
+                return 0.
+            x1 = np.minimum(np.min(a[:, 0]), np.min(b[:, 0]))
+            x2 = np.maximum(np.max(a[:, 0]), np.max(b[:, 0]))
+            y1 = np.minimum(np.min(a[:, 1]), np.min(b[:, 1]))
+            y2 = np.maximum(np.max(a[:, 1]), np.max(b[:, 1]))
+            if x1 >= x2 or y1 >= y2 or (x2 - x1) < 2 or (y2 - y1) < 2:
+                return 0.
+
+        g = Polygon(g)
+        p = Polygon(p)
+        if not g.is_valid or not p.is_valid:
+            return 0
+
+        inter = Polygon(g).intersection(Polygon(p)).area
+        union = g.area + p.area - inter
+        if union == 0:
+            return 0
+        else:
+            return inter / union
+
+    def copy_and_paste(self, data):
 
         return data
 
     def __call__(self, data):
-        data_new = data.deep_copy()
+        data_new = copy.deep_copy(data)
 
-        if np.random.random() <= self.copy_prob and len(self.memory_bank)>0:
+        if np.random.random() <= self.copy_prob and len(self.memory_bank) > 0:
             data = self.copy_and_paste(data)
 
         self.update_mem(data)
 
         return data
+
 

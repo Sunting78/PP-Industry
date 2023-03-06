@@ -4,14 +4,15 @@ import math
 import cv2
 import numpy as np
 from PIL import Image
-
+from ppdet.core.workspace import serializable
 from ppdet.data.transform.operators import BaseOperator, register_op
+from ppdet.core.workspace import register
 
 __all__ = [
     'RandomCopyPaste'
 ]
 
-@register_op
+@register
 class RandomCopyPaste(BaseOperator):
     """
     Rotate an image randomly with padding.

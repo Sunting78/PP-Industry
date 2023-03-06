@@ -3,8 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 dataset/
+output/
 # C extensions
 *.so
+*.json
 
 # Distribution / packaging
 .Python

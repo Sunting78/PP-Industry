@@ -1,2 +1,3 @@
 paddledet
 paddleseg
+opencv-python
