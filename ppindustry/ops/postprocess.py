@@ -37,7 +37,6 @@ class PostProcess(object):
 
     def init(self, cfg):
         self.rules = []
-        import pdb;pdb.set_trace()
         if isinstance(cfg, list):
             for sub_op in cfg:
                 sub_op_arch = list(sub_op.keys())[0]
@@ -65,22 +64,50 @@ class JudgeDetByScores(object):
         self.score_threshold = cfg['score_threshold']
         #mod = importlib.import_module(__name__)
 
-    def __call__(self, input):
-        
-        import pdb;pdb.set_trace()
-        
-        return input
+    def __call__(self, inputs):
+        for pred in inputs:
+            if pred.get("isNG", 1):
+                if isinstance(self.score_threshold, dict):
+                    if pred['category_id'] in self.score_threshold.keys():
+                        threshold = self.score_threshold[pred['category_id']]
+                    else:  
+                        pred['judge'] = 'OK'
+                        continue
+                else: 
+                    threshold = self.score_threshold
+                
+                if pred['score'] < threshold:
+                    pred['isNG'] = 0
+                else:
+                    pred['isNG'] = 1
+
+        return inputs
 
 @register
 class JudgeByLengthWidth(object):
     def __init__(self, cfg, env_cfg=None):
         super(JudgeByLengthWidth, self).__init__()
-        self.filterlen_thresh = cfg['filterlen_thresh']
+        self.len_thresh = cfg['len_thresh']
         #mod = importlib.import_module(__name__)
 
-    def __call__(self, input):
-        import pdb;pdb.set_trace()
-        return input
+    def __call__(self, inputs):
+        for pred in inputs:
+            if pred.get("isNG", 1):
+                if isinstance(self.len_thresh, dict):
+                    if pred['category_id'] in self.len_thresh.keys():
+                        threshold = self.len_thresh[pred['category_id']]
+                    else:  
+                        pred['isNG'] = 1
+                        continue
+                else: 
+                    threshold = self.len_thresh
+                
+                if pred['bbox'][2] >= threshold or pred['bbox'][3] >= threshold:
+                    pred['isNG'] = 1
+                else:
+                    pred['isNG'] = 0
+
+        return inputs
 
 @register
 class JudgeByArea(object):
@@ -89,6 +116,23 @@ class JudgeByArea(object):
         self.model_cfg = cfg
         #mod = importlib.import_module(__name__)
 
-    def __call__(self, input):
-        import pdb;pdb.set_trace()
-        return input
+    def __call__(self, inputs):
+        for pred in inputs:
+            if isinstance(self.score_threshold, dict):
+                if pred['category_id'] in self.score_threshold.keys():
+                    threshold = self.score_threshold[pred['category_id']]
+                else:  
+                    pred['judge'] = 'OK'
+                    continue
+            else: 
+                threshold = self.score_threshold
+            '''
+            if pred['seg'][2] >= threshold or pred['bbox'][3] >= threshold:
+                pred['isNG'] = 1
+            else:
+                pred['isNG'] = 0
+
+            '''
+
+
+        return inputs

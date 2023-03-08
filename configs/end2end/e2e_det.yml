@@ -9,4 +9,4 @@ PipeLine:
       - JudgeDetByScores:
           score_threshold: {1: 0.5} #{class_id or name: threshold}
       - JudgeByLengthWidth:
-          filterlen_thresh: {1: 10} # smaller than it is OK sample
+          len_thresh: 10 # smaller than it is OK sample

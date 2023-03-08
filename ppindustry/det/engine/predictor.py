@@ -58,7 +58,7 @@ class Predictor(Trainer):
             infer_res = self.get_det_res(
                 outs['bbox'], outs['bbox_num'], outs['im_id'], clsid2catid, imid2path)
 
-            results.append(infer_res)
+            results.extend(infer_res)
 
         if visualize:
             for outs in results:

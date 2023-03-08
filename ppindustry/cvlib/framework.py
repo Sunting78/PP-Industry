@@ -66,7 +66,6 @@ class Builder(object):
         
         # execute each operator according to toposort order
         for op_name, op in self.op_name2op.items():
-            import pdb;pdb.set_trace()
             result = op(input)
             input = result
 
