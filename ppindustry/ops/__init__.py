@@ -8,5 +8,6 @@ import importlib
 
 from .detection import Detection
 from .postprocess import PostProcess
+from .segmentation import BaseSegmentation, CropSegmentation
 
-__all__ = ['Detection','PostProcess']
+__all__ = ['Detection','PostProcess','BaseSegmentation', 'CropSegmentation']

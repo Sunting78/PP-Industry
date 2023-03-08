@@ -1,18 +1,21 @@
+ENV:
+  device: cpu
 PipeLine:
   - Detection:
       config_path: /ssd3/sunting/PP-Industry/configs/det/hrnet/faster_rcnn_hrnetv2p_w18_1x_defect.yml
       model_path: /ssd3/sunting/PP-Industry/output/faster_rcnn_hrnetv2p_w18_1x_defect/model_final.pdparams
   - CropSegmentation:
       pad_scale: 0.5
-      classes: [1, 2, 3]
-      crop_thresh: 0.3
-      config_path: /ssd3/sunting/PP-Industry/configs/det/hrnet/faster_rcnn_hrnetv2p_w18_1x_defect.yml
-      model_path: /ssd3/sunting/PP-Industry/output/faster_rcnn_hrnetv2p_w18_1x_defect/model_final.pdparams
+      crop_thresh: {1:0.3}  #{class: score}
+      config_path: /ssd3/sunting/PP-Industry/configs/seg/ocrnet/ocrnet_hrnetw18_ksdd2.yml 
+      model_path: /ssd3/sunting/PP-Industry/output/ROI_seg/iter_16000/model.pdparams
+      aug_pred : False
+      visualize: False
   - PostProcess:
       - JudgeDetByScores:
-          score_threshold: {1: 0.5} #{class_id or name: threshold}
+          score_threshold: {1: 0.5}  # {class_id or name: threshold}
       - JudgeByLengthWidth:
-          len_thresh: 10 # smaller than it is OK sample
+          len_thresh: 10  # smaller than it is OK sample
       - JudgeByArea:
           area_thresh: 10
 

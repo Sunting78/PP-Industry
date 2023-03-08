@@ -63,7 +63,7 @@ class Builder(object):
                         del res[name]
 
     def run(self, input, frame_id=-1):
-        
+        import pdb;pdb.set_trace()
         # execute each operator according to toposort order
         for op_name, op in self.op_name2op.items():
             result = op(input)
