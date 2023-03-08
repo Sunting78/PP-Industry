@@ -15,9 +15,5 @@ PipeLine:
       aug_pred : False
       visualize: False
   - PostProcess:
-      - JudgeDetByScores:
-          score_threshold: {1: 0.5}  # {class_id or name: threshold}
-      - JudgeByLengthWidth:
-          len_thresh: 10  # smaller than it is OK sample
       - JudgeByArea:
           area_thresh: 10

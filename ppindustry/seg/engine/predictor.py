@@ -11,7 +11,7 @@ from paddleseg.core import infer
 from paddleseg.cvlibs import Config
 from paddleseg.utils import progbar
 from ppindustry.utils.logger import setup_logger
-logger = setup_logger('Predictor')
+logger = setup_logger('SegPredictor')
 from paddleseg.transforms import Compose
 from paddleseg.utils import progbar, visualize
 from paddleseg.core.predict import partition_list, preprocess, mkdir
@@ -78,6 +78,7 @@ class SegPredictor(object):
                         crop_size=crop_size)
                 pred = paddle.squeeze(pred)
                 pred = pred.numpy().astype('uint8')
+                import pdb;pdb.set_trace()
                 results.append({'mask': pred, 
                                 'img_path': im_path})
 

@@ -17,6 +17,7 @@ import os
 import importlib
 import numpy as np
 import math
+import cv2
 import paddle
 
 from ppindustry.cvlib.workspace import register
@@ -35,8 +36,37 @@ class BaseSegmentation(object):
         seg_model = model_cfg['model_path']
         self.predictor = SegPredictor(seg_config, seg_model)   
 
+    def update(self, preds):
+        results = {}
+        for pred in preds:
+            im_path = pred['im_path']
+            mask = pred['mask']
+            class_list = np.unique(mask)
+            # get polygon
+            polygon = []
+            for cls_id in class_list:
+                if cls_id == 0:
+                    continue # skip background
+                class_map = np.equal(mask, cls_id).astype(np.uint8)
+                contours, _ = cv2.findContours(class_map, cv2.RETR_LIST,
+                                            cv2.CHAIN_APPROX_SIMPLE)
+                for j in range(len(contours)):
+                    polygon.append(contours[j].flatten().tolist())
+                    
+
+                results.append({
+                    'im_path': im_path,
+                    'category_id': cls_id,
+                    #'mask': class_map,
+                    'polygon': polygon,
+                    'area': np.sum(class_map > 0),
+                })
+            
+        return results
+        
     def __call__(self, inputs):
         results = self.predictor.predict(image_list = inputs)
+        results = self.update(results)
         import pdb;pdb.set_trace()
         return results
 
@@ -92,7 +122,7 @@ class CropSegmentation(object):
 
     def __call__(self, input):
 
-        results = self.predictor.predict()
+        results = self.predictor.predict(input)
         return results
 
 
