@@ -25,6 +25,29 @@ class SegPredictor(object):
         self.transforms = Compose(seg_config.val_transforms)
         utils.utils.load_entire_model(self.model, self.model_path)
         self.model.eval()
+    
+    def postprocess(self, pred, img_path):
+        class_list = np.unique(pred)
+        result = []
+        # get polygon
+        polygon = []
+        for cls_id in class_list:
+            if cls_id == 0:
+                continue # skip background
+            class_map = np.equal(pred, cls_id).astype(np.uint8)
+            contours, _ = cv2.findContours(class_map, cv2.RETR_LIST,
+                                        cv2.CHAIN_APPROX_SIMPLE)
+            for j in range(len(contours)):
+                polygon.append(contours[j].flatten().tolist())
+                
+            result.append({
+                'img_path': img_path,
+                'category_id': cls_id,
+                #'mask': class_map,
+                'polygon': polygon,
+                'area': np.sum(class_map > 0),
+            })
+        return result
 
     def predict(self,
                 image_list,
@@ -56,7 +79,6 @@ class SegPredictor(object):
         with paddle.no_grad():
             for i, im_path in enumerate(img_lists[local_rank]):
                 data = preprocess(im_path, self.transforms)
-                import pdb;pdb.set_trace()
                 if aug_pred:
                     pred, _ = infer.aug_inference(
                         self.model,
@@ -78,9 +100,8 @@ class SegPredictor(object):
                         crop_size=crop_size)
                 pred = paddle.squeeze(pred)
                 pred = pred.numpy().astype('uint8')
-                import pdb;pdb.set_trace()
-                results.append({'mask': pred, 
-                                'img_path': im_path})
+                result = self.postprocess(pred, im_path)
+                results.extend(result)
 
 
                 # save added image

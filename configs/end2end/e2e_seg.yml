@@ -16,4 +16,4 @@ PipeLine:
       visualize: False
   - PostProcess:
       - JudgeByArea:
-          area_thresh: 10
+          area_thresh: 100

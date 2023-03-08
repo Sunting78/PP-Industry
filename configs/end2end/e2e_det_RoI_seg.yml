@@ -6,7 +6,7 @@ PipeLine:
       model_path: /ssd3/sunting/PP-Industry/output/faster_rcnn_hrnetv2p_w18_1x_defect/model_final.pdparams
   - CropSegmentation:
       pad_scale: 0.5
-      crop_thresh: {1:0.3}  #{class: score}
+      crop_score_thresh: {1:0.3}  #{class: score}
       config_path: /ssd3/sunting/PP-Industry/configs/seg/ocrnet/ocrnet_hrnetw18_ksdd2.yml 
       model_path: /ssd3/sunting/PP-Industry/output/ROI_seg/iter_16000/model.pdparams
       aug_pred : False
@@ -17,6 +17,6 @@ PipeLine:
       - JudgeByLengthWidth:
           len_thresh: 10  # smaller than it is OK sample
       - JudgeByArea:
-          area_thresh: 10
+          area_thresh: {1:10}
 
 

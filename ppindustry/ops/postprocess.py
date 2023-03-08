@@ -113,26 +113,29 @@ class JudgeByLengthWidth(object):
 class JudgeByArea(object):
     def __init__(self, cfg, env_cfg=None):
         super(JudgeByArea, self).__init__()
-        self.model_cfg = cfg
+        self.area_thresh = cfg['area_thresh']
         #mod = importlib.import_module(__name__)
 
     def __call__(self, inputs):
         for pred in inputs:
-            if isinstance(self.score_threshold, dict):
-                if pred['category_id'] in self.score_threshold.keys():
-                    threshold = self.score_threshold[pred['category_id']]
+            if isinstance(self.area_thresh, dict):
+                if pred['category_id'] in self.area_thresh.keys():
+                    threshold = self.area_thresh[pred['category_id']]
                 else:  
                     pred['judge'] = 'OK'
                     continue
             else: 
-                threshold = self.score_threshold
-            '''
-            if pred['seg'][2] >= threshold or pred['bbox'][3] >= threshold:
-                pred['isNG'] = 1
-            else:
-                pred['isNG'] = 0
+                threshold = self.area_thresh
 
-            '''
-
+            if 'area' in pred.keys():
+                if pred['area'] >= threshold:
+                    pred['isNG'] = 1
+                else:
+                    pred['isNG'] = 0
+            elif 'bbox' in pred.keys():
+                if pred['bbox'][2] * pred['bbox'][3] >= threshold:
+                    pred['isNG'] = 1
+                else:
+                    pred['isNG'] = 0
 
         return inputs
