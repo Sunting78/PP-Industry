@@ -1,0 +1,12 @@
+ENV:
+  device: cpu
+PipeLine:
+  - Detection:
+      config_path: /ssd3/sunting/PP-Industry/configs/det/hrnet/faster_rcnn_hrnetv2p_w18_1x_defect.yml
+      model_path: /ssd3/sunting/PP-Industry/output/faster_rcnn_hrnetv2p_w18_1x_defect/model_final.pdparams
+      classes: [1]
+  - PostProcess:
+      - JudgeDetByScores:
+          score_threshold: {1: 0.5} #{class_id or name: threshold}
+      - JudgeByLengthWidth:
+          filterlen_thresh: {1: 10} # smaller than it is OK sample

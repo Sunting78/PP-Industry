@@ -23,7 +23,7 @@ EvalReader:
   - Permute: {}
   batch_transforms:
   - PadBatch: {pad_to_stride: 32}
-  batch_size: 1
+  batch_size: 2
   shuffle: false
   drop_last: false
 
@@ -36,6 +36,6 @@ TestReader:
   - Permute: {}
   batch_transforms:
   - PadBatch: {pad_to_stride: 32}
-  batch_size: 1
+  batch_size: 2
   shuffle: false
   drop_last: false

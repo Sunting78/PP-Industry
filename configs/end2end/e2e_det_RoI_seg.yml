@@ -1,0 +1,22 @@
+PipeLine:
+  - Detection:
+      name: det
+      config_path: /ssd3/sunting/PP-Industry/configs/det/hrnet/faster_rcnn_hrnetv2p_w18_1x_defect.yml
+      model_path: /ssd3/sunting/PP-Industry/output/faster_rcnn_hrnetv2p_w18_1x_defect/model_final.pdparams
+  - DetCropOp:
+      name: crop
+      pad_scale: 0.5
+      classes: [1,2,3]
+      crop_scores: 0.3
+  - Segmentation:
+      name: seg
+      config_path: /ssd3/sunting/PP-Industry/configs/det/hrnet/faster_rcnn_hrnetv2p_w18_1x_defect.yml
+      model_path: /ssd3/sunting/PP-Industry/output/faster_rcnn_hrnetv2p_w18_1x_defect/model_final.pdparams
+  - PostProcess:
+      - FilterByScores:
+          threshold: 0.5
+      - FilterByLengthWidth:
+          filterlen_thresh: 20
+
+
+

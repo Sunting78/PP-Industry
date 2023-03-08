@@ -30,7 +30,7 @@ PaddleIndustry aims to create multilingual, awesome, leading, and practical indu
   ```
 ## Overall directory structure
 
-The overall directory structure of PaddleOCR is introduced as follows:
+The overall directory structure of PaddleIndustry is introduced as follows:
 
 
 ```
