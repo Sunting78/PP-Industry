@@ -25,6 +25,7 @@ import xml.etree.ElementTree as ET
 import numpy as np
 import PIL.ImageDraw
 from tqdm import tqdm
+
 import cv2
 
 label_to_num = {}

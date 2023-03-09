@@ -12,26 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
 import os
 import sys
+
+import numpy as np
+from scipy.cluster.vq import kmeans
+from tqdm import tqdm
+
+from ppdet.core.workspace import load_config, merge_config
+from ppdet.utils.check import check_config, check_gpu, check_version
+from ppdet.utils.cli import ArgsParser
+from ppdet.utils.logger import setup_logger
+
 # add python path of PaddleDetection to sys.path
 parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 2)))
 sys.path.insert(0, parent_path)
 
-from ppdet.utils.logger import setup_logger
 logger = setup_logger('ppdet.anchor_cluster')
 
-from scipy.cluster.vq import kmeans
-import numpy as np
-from tqdm import tqdm
 
-from ppdet.utils.cli import ArgsParser
-from ppdet.utils.check import check_gpu, check_version, check_config
-from ppdet.core.workspace import load_config, merge_config
 
 
 class BaseAnchorCluster(object):

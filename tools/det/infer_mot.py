@@ -12,26 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
 import os
 import sys
+# ignore warning log
+import warnings
+
+import paddle
+from ppdet.core.workspace import load_config, merge_config
+from ppdet.engine import Tracker
+from ppdet.utils.check import (check_config, check_gpu, check_mlu, check_npu,
+                               check_version, check_xpu)
+from ppdet.utils.cli import ArgsParser
 
 # add python path of PaddleDetection to sys.path
 parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 2)))
 sys.path.insert(0, parent_path)
 
-# ignore warning log
-import warnings
 warnings.filterwarnings('ignore')
 
-import paddle
-from ppdet.core.workspace import load_config, merge_config
-from ppdet.engine import Tracker
-from ppdet.utils.check import check_gpu, check_npu, check_xpu, check_mlu, check_version, check_config
-from ppdet.utils.cli import ArgsParser
 
 
 def parse_args():

@@ -12,15 +12,16 @@
 # See the License for the specific language governing permissions and   
 # limitations under the License.
 
+import glob
+import math
 import os
 import sys
+
 import numpy as np
-import math
-import glob
 
 import ppindustry
-from ppindustry.ops import *
 from ppindustry.cvlib.workspace import get_global_op
+from ppindustry.ops import *
 
 
 def get_output_keys(cfg=None):

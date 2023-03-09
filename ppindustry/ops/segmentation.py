@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and   
 # limitations under the License.
 
-from functools import reduce
-import os
 import importlib
-import numpy as np
 import math
+import os
+from functools import reduce
+
+import numpy as np
+
 import cv2
 import paddle
-
-from ppindustry.cvlib.workspace import register
 from paddleseg.cvlibs import Config
+from paddleseg.utils import get_image_list, get_sys_env, logger
+from ppindustry.cvlib.workspace import register
 from ppindustry.seg.engine import SegPredictor
-
-from paddleseg.utils import get_sys_env, logger, get_image_list
 
 
 @register
@@ -110,5 +110,3 @@ class CropSegmentation(object):
 
 
         return results
-
-

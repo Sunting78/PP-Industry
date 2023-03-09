@@ -1,15 +1,17 @@
 import os
-from tqdm import tqdm
 import typing
 
-from ppdet.core.workspace import create
-from ppdet.engine import Trainer
-from ppdet.data.source.category import get_categories
-from ppdet.utils.visualizer import visualize_results, save_result
-from ppdet.metrics import get_infer_results
 import numpy as np
-from PIL import Image, ImageOps, ImageFile
+from PIL import Image, ImageFile, ImageOps
+from tqdm import tqdm
+
+from ppdet.core.workspace import create
+from ppdet.data.source.category import get_categories
+from ppdet.engine import Trainer
+from ppdet.metrics import get_infer_results
+from ppdet.utils.visualizer import save_result, visualize_results
 from ppindustry.utils.logger import setup_logger
+
 logger = setup_logger('Predictor')
 
 class Predictor(Trainer):

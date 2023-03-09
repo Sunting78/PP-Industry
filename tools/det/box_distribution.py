@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import matplotlib.pyplot as plt
-import json
-import numpy as np
 import argparse
-from pycocotools.coco import COCO
+import json
+
+import matplotlib.pyplot as plt
+import numpy as np
 from tqdm import tqdm
+
+from pycocotools.coco import COCO
 
 
 def median(data):

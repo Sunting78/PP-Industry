@@ -12,34 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
 import os
 import sys
+# ignore warning log
+import warnings
+
+import paddle
+import ppdet.utils.check as check
+from ppdet.core.workspace import load_config, merge_config
+from ppdet.engine import (Trainer, TrainerCot, init_fleet_env,
+                          init_parallel_env, set_random_seed)
+from ppdet.engine.trainer_ssod import Trainer_DenseTeacher
+from ppdet.slim import build_slim_model
+from ppdet.utils.cli import ArgsParser, merge_args
+from ppdet.utils.logger import setup_logger
+
 
 # add python path of PaddleDetection to sys.path
 parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 3)))
 sys.path.insert(0, parent_path)
+
 from ppindustry import *
-
-# ignore warning log
-import warnings
 warnings.filterwarnings('ignore')
-
-import paddle
-
-from ppdet.core.workspace import load_config, merge_config
-
-from ppdet.engine import Trainer, TrainerCot, init_parallel_env, set_random_seed, init_fleet_env
-from ppdet.engine.trainer_ssod import Trainer_DenseTeacher
-
-from ppdet.slim import build_slim_model
-
-from ppdet.utils.cli import ArgsParser, merge_args
-import ppdet.utils.check as check
-from ppdet.utils.logger import setup_logger
 logger = setup_logger('train')
 
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved. 
+# Copyright (c) 2023 PaddlePaddle Authors. All Rights Reserved. 
 #   
 # Licensed under the Apache License, Version 2.0 (the "License");   
 # you may not use this file except in compliance with the License.  
@@ -12,19 +12,21 @@
 # See the License for the specific language governing permissions and   
 # limitations under the License.
 
-import os
-import numpy as np
-import math
-import paddle
 import collections
-from collections import defaultdict
-from collections.abc import Sequence, Mapping
-import yaml
 import copy
+import math
+import os
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
-from ppindustry.utils.logger import setup_logger
+from collections import defaultdict
+from collections.abc import Mapping, Sequence
+
+import numpy as np
+import yaml
+
+import paddle
 import ppindustry
 from ppindustry.ops import *
+from ppindustry.utils.logger import setup_logger
 
 logger = setup_logger('config')
 

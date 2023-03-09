@@ -1,21 +1,22 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
 import os
 import sys
+# ignore warning log
+import warnings
+
+import paddle
+from ppdet.core.workspace import load_config, merge_config
+from ppdet.utils.cam_utils import BBoxCAM
+from ppdet.utils.check import (check_config, check_gpu, check_npu,
+                               check_version, check_xpu)
+from ppdet.utils.cli import ArgsParser, merge_args
+
 # add python path of PadleDetection to sys.path
 parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 2)))
 sys.path.insert(0, parent_path)
 
-# ignore warning log
-import warnings
 warnings.filterwarnings('ignore')
-from ppdet.utils.cli import ArgsParser, merge_args
-from ppdet.core.workspace import load_config, merge_config
-from ppdet.utils.check import check_gpu, check_npu, check_xpu, check_version, check_config
-from ppdet.utils.cam_utils import BBoxCAM
-import paddle
 
 
 

@@ -12,17 +12,19 @@
 # See the License for the specific language governing permissions and   
 # limitations under the License.
 
-from functools import reduce
-import os
 import importlib
-import numpy as np
 import math
-import paddle
+import os
+from functools import reduce
 
-from ppindustry.cvlib.workspace import register
+import numpy as np
+
+import paddle
 import ppdet
 from ppdet.core.workspace import load_config, merge_config
+from ppindustry.cvlib.workspace import register
 from ppindustry.det.engine import Predictor
+
 
 @register
 class Detection(object):
@@ -40,4 +42,3 @@ class Detection(object):
     def __call__(self, input):
         results = self.predictor.predict(input, visualize=False)
         return results
-

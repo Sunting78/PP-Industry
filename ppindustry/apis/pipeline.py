@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved. 
+# Copyright (c) 2023 PaddlePaddle Authors. All Rights Reserved. 
 #   
 # Licensed under the Apache License, Version 2.0 (the "License");   
 # you may not use this file except in compliance with the License.  
@@ -12,22 +12,25 @@
 # See the License for the specific language governing permissions and   
 # limitations under the License.
 
+import glob
+import math
 import os
 import sys
-import numpy as np
-import math
-import glob
-import paddle
-import cv2
 from collections import defaultdict
+
+import numpy as np
+
+import cv2
+import paddle
+from ppindustry.cvlib.configs import ConfigParser
+from ppindustry.cvlib.framework import Builder
+from ppindustry.utils.logger import setup_logger
+
 try:
     from collections.abc import Sequence
 except Exception:
     from collections import Sequence
 
-from ppindustry.cvlib.framework import Builder
-from ppindustry.utils.logger import setup_logger
-from ppindustry.cvlib.configs import ConfigParser
 
 logger = setup_logger('pipeline')
 

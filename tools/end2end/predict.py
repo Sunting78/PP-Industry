@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved. 
+# Copyright (c) 2023 PaddlePaddle Authors. All Rights Reserved. 
 #   
 # Licensed under the Apache License, Version 2.0 (the "License");   
 # you may not use this file except in compliance with the License.  
@@ -12,19 +12,21 @@
 # See the License for the specific language governing permissions and   
 # limitations under the License.
 
+import glob
+import math
 import os
 import sys
+
 import numpy as np
-import math
-import glob
-import paddle
+
 import cv2
+import paddle
+from ppindustry.apis.pipeline import Pipeline
+from ppindustry.cvlib.configs import ArgsParser
 
 parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 3)))
 sys.path.insert(0, parent_path)
 
-from ppindustry.apis.pipeline import Pipeline
-from ppindustry.cvlib.configs import ArgsParser
 
 
 def argsparser():

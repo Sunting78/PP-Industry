@@ -1,24 +1,28 @@
-import os
-import json
+# Copyright (c) 2023 PaddlePaddle Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 import argparse
+import json
+import os
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+
 import cv2
-import matplotlib.pyplot as plt
 import pycocotools.mask as mask_util
 
-
-def check_dir(check_path, show=True):
-    if os.path.isdir(check_path):
-        check_directory = check_path
-    else:
-        check_directory = os.path.dirname(check_path)
-    if len(check_directory) > 0 and not os.path.exists(check_directory):
-        os.makedirs(check_directory)
-        if show:
-            print('make dir:', check_directory)
 
 def square(bbox, size):
     x1, y1, x2, y2 = bbox
@@ -91,13 +95,6 @@ def generate_mask_RoI(img_to_anno, output_path):
 
     print('task done!')
 
-
-
-
-
-
-
-
 def read_json(json_path): # read json
     with open(json_path, "r") as f:
         data = json.load(f)
@@ -165,5 +162,3 @@ if __name__ == '__main__':
     data = read_json(args.json_path)
     img_to_annos = group_images_annotations(data, args.seg_classid)
     generate_mask_RoI(img_to_annos, args.output_path)
-
-

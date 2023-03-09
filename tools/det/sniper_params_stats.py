@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import json
 import logging
+import sys
+
 import numpy as np
 
 from ppdet.utils.logger import setup_logger
+
 logger = setup_logger('sniper_params_stats')
 
 def get_default_params(architecture):

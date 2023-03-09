@@ -12,15 +12,18 @@
 # See the License for the specific language governing permissions and   
 # limitations under the License.
 
-import os
-import numpy as np
 import math
-import paddle
+import os
 from collections import defaultdict
+
+import numpy as np
+
+import paddle
 import ppindustry
-from ppindustry.ops import *
-from ppindustry.utils.helper import get_output_keys, gen_input_name
 from ppindustry.cvlib.workspace import create
+from ppindustry.ops import *
+from ppindustry.utils.helper import gen_input_name, get_output_keys
+
 
 class Builder(object):
     """

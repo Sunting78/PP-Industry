@@ -12,16 +12,17 @@
 # See the License for the specific language governing permissions and   
 # limitations under the License.
 
-from functools import reduce
-import os
 import importlib
-import numpy as np
 import math
-import paddle
+import os
+from functools import reduce
 
-from ppindustry.cvlib.workspace import register
-from ppindustry.cvlib.workspace import create
+import numpy as np
+
+import paddle
+from ppindustry.cvlib.workspace import create, register
 from ppindustry.utils.logger import setup_logger
+
 logger = setup_logger('PostProcess')
 
 @register
