@@ -28,7 +28,7 @@ from ppdet.engine.trainer_ssod import Trainer_DenseTeacher
 from ppdet.slim import build_slim_model
 from ppdet.utils.cli import ArgsParser, merge_args
 from ppdet.utils.logger import setup_logger
-
+from ppdet.data.transform.operators import BaseOperator, register_op
 
 # add python path of PaddleDetection to sys.path
 parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 3)))
@@ -144,7 +144,6 @@ def run(FLAGS, cfg):
         trainer.resume_weights(FLAGS.resume)
     elif 'pretrain_weights' in cfg and cfg.pretrain_weights:
         trainer.load_weights(cfg.pretrain_weights)
-
     # training
     trainer.train(FLAGS.eval)
 
