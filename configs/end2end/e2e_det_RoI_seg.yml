@@ -17,6 +17,6 @@ PipeLine:
       - JudgeByLengthWidth:
           len_thresh: 10  # smaller than it is OK sample
       - JudgeByArea:
-          area_thresh: {1:10}
+          area_thresh: {1: 10}
 
 

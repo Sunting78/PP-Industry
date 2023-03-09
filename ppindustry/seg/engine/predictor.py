@@ -14,7 +14,19 @@ from ppindustry.utils.logger import setup_logger
 logger = setup_logger('SegPredictor')
 from paddleseg.transforms import Compose
 from paddleseg.utils import progbar, visualize
-from paddleseg.core.predict import partition_list, preprocess, mkdir
+from paddleseg.core.predict import partition_list, mkdir
+
+def preprocess(im_data, transforms):
+    
+    if not isinstance(im_data, dict):
+        data = {}
+        data['img'] = im_data
+    else:
+        data = im_data
+    data = transforms(data)
+    data['img'] = data['img'][np.newaxis, ...]
+    data['img'] = paddle.to_tensor(data['img'])
+    return data
 
 class SegPredictor(object):
     def __init__(self, seg_config, seg_model):
@@ -26,27 +38,65 @@ class SegPredictor(object):
         utils.utils.load_entire_model(self.model, self.model_path)
         self.model.eval()
     
-    def postprocess(self, pred, img_path):
+    def postprocess(self, pred, img_data):
         class_list = np.unique(pred)
         result = []
         # get polygon
-        polygon = []
+        
         for cls_id in class_list:
+            
             if cls_id == 0:
                 continue # skip background
             class_map = np.equal(pred, cls_id).astype(np.uint8)
             contours, _ = cv2.findContours(class_map, cv2.RETR_LIST,
                                         cv2.CHAIN_APPROX_SIMPLE)
+            polygon = []
             for j in range(len(contours)):
                 polygon.append(contours[j].flatten().tolist())
-                
+            
             result.append({
-                'img_path': img_path,
+                'img_path': img_data,
                 'category_id': cls_id,
                 #'mask': class_map,
                 'polygon': polygon,
                 'area': np.sum(class_map > 0),
             })
+
+
+        return result
+
+    def roi_postprocess(self, pred, img_data):
+        
+        class_list = np.unique(pred)
+        result = []
+        for cls_id in class_list:
+            if cls_id == 0:
+                continue # skip background
+            class_map = np.equal(pred, cls_id).astype(np.uint8)
+
+            crop_bbox = img_data['crop_bbox']
+            bbox = img_data['bbox']
+            # get mask
+            offset_left = bbox[0] - crop_bbox[0]
+            offset_top = bbox[1] - crop_bbox[1]
+            offset_right = offset_left + bbox[2] - bbox[0]
+            offset_bottom = offset_top + bbox[3] - bbox[1]
+            class_map = class_map[int(offset_top):int(offset_bottom),
+                             int(offset_left):int(offset_right)].astype(np.uint8)
+            contours, _ = cv2.findContours(class_map, cv2.RETR_LIST,
+                                        cv2.CHAIN_APPROX_SIMPLE)
+            polygon = []
+            for j in range(len(contours)):
+                contours[j][..., 0] += int(bbox[0])
+                contours[j][..., 1] += int(bbox[1])
+                polygon.append(contours[j].flatten().tolist())
+            img_data.pop('img', None)
+            #img_data.pop('crop_box', None)
+            img_data['polygon'] = polygon
+            img_data['area'] =  np.sum(class_map > 0)
+
+            result.append(img_data)
+
         return result
 
     def predict(self,
@@ -77,8 +127,8 @@ class SegPredictor(object):
         progbar_pred = progbar.Progbar(target=len(img_lists[0]), verbose=1)
         color_map = visualize.get_color_map_list(256, custom_color=custom_color)
         with paddle.no_grad():
-            for i, im_path in enumerate(img_lists[local_rank]):
-                data = preprocess(im_path, self.transforms)
+            for i, im_data in enumerate(img_lists[local_rank]):
+                data = preprocess(im_data, self.transforms)
                 if aug_pred:
                     pred, _ = infer.aug_inference(
                         self.model,
@@ -100,7 +150,11 @@ class SegPredictor(object):
                         crop_size=crop_size)
                 pred = paddle.squeeze(pred)
                 pred = pred.numpy().astype('uint8')
-                result = self.postprocess(pred, im_path)
+
+                if isinstance(im_data, dict):
+                    result = self.roi_postprocess(pred, im_data)
+                else:
+                    result = self.postprocess(pred, im_data)
                 results.extend(result)
 
 

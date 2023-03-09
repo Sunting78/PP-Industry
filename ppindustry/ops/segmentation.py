@@ -49,7 +49,7 @@ class CropSegmentation(object):
         seg_config = model_cfg['config_path']
         seg_config = Config(seg_config)
         seg_model = model_cfg['model_path']
-        self.crop_thresh = model_cfg['crop_thresh']
+        self.crop_score_thresh = model_cfg['crop_score_thresh']
         self.pad_scale = model_cfg['pad_scale']
 
         self.predictor = SegPredictor(seg_config, seg_model) 
@@ -93,8 +93,22 @@ class CropSegmentation(object):
         return bbox
 
     def __call__(self, input):
-        import pdb;pdb.set_trace()
+        for data in input:
+            image_path = data['image_path']
+            bbox =  data['bbox']
+            img = cv2.imread(image_path)
+            crop_bbox = self.adjust_bbox(
+                                        [int(bbox[0]), int(bbox[1]), int(bbox[0]+bbox[2]), int(bbox[1]+bbox[3])], 
+                                        img_shape=img.shape[:2], 
+                                        pad_scale=self.pad_scale)
+
+            img_crop = img[crop_bbox[1]:crop_bbox[3], crop_bbox[0]:crop_bbox[2], :]
+            data['img'] = img_crop
+            data['img_shape'] = img.shape[:2]
+            data['crop_bbox'] = crop_bbox
         results = self.predictor.predict(input)
+
+
         return results
 
 
