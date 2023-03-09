@@ -35,6 +35,7 @@ parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 3)))
 sys.path.insert(0, parent_path)
 
 from ppindustry import *
+
 warnings.filterwarnings('ignore')
 logger = setup_logger('train')
 

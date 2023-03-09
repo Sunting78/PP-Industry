@@ -29,10 +29,6 @@ parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 3)))
 sys.path.insert(0, parent_path)
 
 from ppindustry import *
-#sys.path.append('/ssd3/sunting/PP-Industry/ppindustry/')
-#sys.path.append('/ssd3/sunting/PP-Industry/ppindustry/seg/')
-#sys.path.append('/ssd3/sunting/PP-Industry/ppindustry/seg/transforms')
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Model training')

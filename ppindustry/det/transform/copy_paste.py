@@ -12,7 +12,7 @@ __all__ = [
     'RandomCopyPaste'
 ]
 
-@register
+@register_op
 class RandomCopyPaste(BaseOperator):
     """
     Rotate an image randomly with padding.
