@@ -15,27 +15,13 @@
 import glob
 import math
 import os
-import sys
-from collections import defaultdict
-
 import numpy as np
 
-import cv2
-import paddle
 from ppindustry.cvlib.configs import ConfigParser
 from ppindustry.cvlib.framework import Builder
 from ppindustry.utils.logger import setup_logger
 
-try:
-    from collections.abc import Sequence
-except Exception:
-    from collections import Sequence
-
-
 logger = setup_logger('pipeline')
-
-__all__ = ['Pipeline']
-
 
 class Pipeline(object):
     def __init__(self, cfg):
@@ -78,11 +64,12 @@ class Pipeline(object):
         if input_ext in im_exts:
             input_type = "image"
             return [input], input_type
-        
+
+        '''
         if input_ext in json_exts:
             input_type = "json"
             return [input], input_type
-
+        '''
         raise ValueError("Unsupported input format: {}".fomat(input_ext))
         return
 
@@ -90,29 +77,11 @@ class Pipeline(object):
         input, input_type = self._parse_input(input)
         if input_type == "image" :
             results = self.predict_images(input)
-        elif input_type == "json":
-            results = self.predict_json(input)
         else:
             raise ValueError("Unexpected input type: {}".format(input_type))
         return results
-
-    def decode_image(self, input):
-        if isinstance(input, str):
-            with open(input, 'rb') as f:
-                im_read = f.read()
-            data = np.frombuffer(im_read, dtype='uint8')
-            im = cv2.imdecode(data, 1)  # BGR mode, but need RGB mode
-            im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
-        else:
-            im = input
-        return im
 
     def predict_images(self, input):
         results = self.exe.run(input)
         return results
 
-    def predict_json(self, input):
-        results = {}
-        logger.info('save result to {}'.format(input))
-
-        return results

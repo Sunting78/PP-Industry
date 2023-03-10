@@ -16,6 +16,8 @@ import glob
 import math
 import os
 import sys
+parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 3)))
+sys.path.insert(0, parent_path)
 
 import numpy as np
 
@@ -23,11 +25,6 @@ import cv2
 import paddle
 from ppindustry.apis.pipeline import Pipeline
 from ppindustry.cvlib.configs import ArgsParser
-
-parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 3)))
-sys.path.insert(0, parent_path)
-
-
 
 def argsparser():
     parser = ArgsParser()

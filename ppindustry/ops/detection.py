@@ -21,7 +21,7 @@ import numpy as np
 
 import paddle
 import ppdet
-from ppdet.core.workspace import load_config, merge_config
+from ppdet.core.workspace import load_config
 from ppindustry.cvlib.workspace import register
 from ppindustry.det.engine import Predictor
 
