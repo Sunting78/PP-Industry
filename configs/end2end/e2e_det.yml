@@ -2,8 +2,8 @@ ENV:
   device: cpu
 PipeLine:
   - Detection:
-      config_path: /ssd3/sunting/PP-Industry/configs/det/hrnet/faster_rcnn_hrnetv2p_w18_1x_defect.yml
-      model_path: /ssd3/sunting/PP-Industry/output/faster_rcnn_hrnetv2p_w18_1x_defect/model_final.pdparams
+      config_path: ./configs/det/hrnet/faster_rcnn_hrnetv2p_w18_1x_defect.yml
+      model_path: ./output/faster_rcnn_hrnetv2p_w18_1x_defect/model_final.pdparams
       classes: [1]
   - PostProcess:
       - JudgeDetByScores:

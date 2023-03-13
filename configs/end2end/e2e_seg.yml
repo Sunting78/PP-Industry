@@ -10,8 +10,8 @@ ENV:
 
 PipeLine:
   - BaseSegmentation:
-      config_path: /ssd3/sunting/PP-Industry/configs/seg/ocrnet/ocrnet_hrnetw18_ksdd2.yml 
-      model_path: /ssd3/sunting/PP-Industry/output/ksdd2_SEG/iter_160000/model.pdparams
+      config_path: ./configs/seg/ocrnet/ocrnet_hrnetw18_ksdd2.yml 
+      model_path: ./output/ksdd2_SEG/iter_160000/model.pdparams
       aug_pred : False
       visualize: False
   - PostProcess:
