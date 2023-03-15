@@ -1,0 +1,20 @@
+# common arguments
+device: gpu
+batch_size: 1
+seed: 3
+
+category: bottle
+data_path: /ssd1/zhaoyantao/PP-Industry/data/mvtec_anomaly_detection
+save_path: /ssd1/zhaoyantao/PP-Industry/output
+
+# train arguments
+do_val: True
+backbone_depth: 18
+pretrained_backbone: True
+
+# val and predict arguments
+save_picture: False
+model_path: /ssd1/zhaoyantao/PP-Industry/output/bottle/best.pdparams
+
+img_path: /ssd1/zhaoyantao/PP-Industry/data/mvtec_anomaly_detection/cable/test/bent_wire/000.png
+threshold: 0.5
