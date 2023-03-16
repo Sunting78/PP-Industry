@@ -29,7 +29,6 @@ logger = setup_logger('PostProcess')
 class PostProcess(object):
     def __init__(self, model_cfg, env_cfg):
         super(PostProcess, self).__init__()
-        #self.model_cfg = model_cfg
         self.env_cfg = env_cfg
         self.op_name2op = {}
         self.rule = []

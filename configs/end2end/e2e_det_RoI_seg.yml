@@ -1,5 +1,8 @@
 ENV:
-  device: cpu
+  device: GPU
+  output: ./tmp/
+  save: True
+  visualize: True
 PipeLine:
   - Detection:
       config_path: ./configs/det/hrnet/faster_rcnn_hrnetv2p_w18_1x_defect.yml
@@ -10,7 +13,6 @@ PipeLine:
       config_path: ./configs/seg/ocrnet/ocrnet_hrnetw18_ksdd2.yml 
       model_path: ./output/ROI_seg/iter_16000/model.pdparams
       aug_pred : False
-      visualize: False
   - PostProcess:
       - JudgeDetByScores:
           score_threshold: {1: 0.5}  # {class_id or name: threshold}

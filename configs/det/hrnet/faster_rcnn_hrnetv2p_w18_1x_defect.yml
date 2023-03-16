@@ -21,3 +21,11 @@ LearningRate:
 
 TrainReader:
   batch_size: 16
+
+BBoxPostProcess:
+  decode: RCNNBox
+  nms:
+    name: MultiClassNMS
+    keep_top_k: 100
+    score_threshold: 0.2
+    nms_threshold: 0.5

@@ -36,10 +36,8 @@ class BaseSegmentation(object):
         seg_model = model_cfg['model_path']
         self.predictor = SegPredictor(seg_config, seg_model)   
 
-
     def __call__(self, inputs):
         results = self.predictor.predict(image_list = inputs)
-        
         return results
 
 @register
@@ -105,7 +103,7 @@ class CropSegmentation(object):
             img_crop = img[crop_bbox[1]:crop_bbox[3], crop_bbox[0]:crop_bbox[2], :]
             data['img'] = img_crop
             data['img_shape'] = img.shape[:2]
-            data['crop_bbox'] = crop_bbox
+            data['crop_bbox'] = [crop_bbox[0], crop_bbox[1], crop_bbox[2] - crop_bbox[0], crop_bbox[3] - crop_bbox[1]]
         results = self.predictor.predict(input)
 
 

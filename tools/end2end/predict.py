@@ -31,7 +31,7 @@ def argsparser():
 
     parser.add_argument(
         "--config",
-        type=str,
+        type=str, 
         default=None,
         help=("Path of configure"),
         required=True)
@@ -62,7 +62,7 @@ def argsparser():
 
 if __name__ == '__main__':
     parser = argsparser()
-    FLAGS = parser.parse_args()
-    input = os.path.abspath(FLAGS.input)
-    pipeline = Pipeline(FLAGS)
-    result = pipeline.run(input)
+    args = parser.parse_args()
+    inputs = os.path.abspath(args.input)
+    pipeline = Pipeline(args)
+    result = pipeline.run(inputs)

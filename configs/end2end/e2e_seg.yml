@@ -1,17 +1,13 @@
 ENV:
-  min_subgraph_size: 3
-  shape_info_filename: ./
-  trt_calib_mode: False
-  cpu_threads: 1
-  trt_use_static: False
-  save_img: True
-  save_res: True
-  return_res: True
+  device: GPU
+  output: ./tmp/
+  save: True
+  visualize: True
 
 PipeLine:
   - BaseSegmentation:
       config_path: ./configs/seg/ocrnet/ocrnet_hrnetw18_ksdd2.yml 
-      model_path: ./output/ksdd2_SEG/iter_160000/model.pdparams
+      model_path: ./output/ksdd2/iter_160000/model.pdparams
       aug_pred : False
       visualize: False
   - PostProcess:

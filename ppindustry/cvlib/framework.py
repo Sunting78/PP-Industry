@@ -34,7 +34,7 @@ class Builder(object):
         model_cfg: The models configuration
     """
 
-    def __init__(self, model_cfg, env_cfg):
+    def __init__(self, model_cfg, env_cfg=None):
         self.model_cfg = model_cfg
         self.op_name2op = {}
         self.has_output_op = False

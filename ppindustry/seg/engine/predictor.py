@@ -55,7 +55,6 @@ class SegPredictor(object):
         # get polygon
         
         for cls_id in class_list:
-            
             if cls_id == 0:
                 continue # skip background
             class_map = np.equal(pred, cls_id).astype(np.uint8)
@@ -63,15 +62,18 @@ class SegPredictor(object):
                                         cv2.CHAIN_APPROX_SIMPLE)
             polygon = []
             for j in range(len(contours)):
+                if len(contours[j]) <= 4:
+                    continue
                 polygon.append(contours[j].flatten().tolist())
             
             result.append({
-                'img_path': img_data,
-                'category_id': cls_id,
+                'image_path': img_data,
+                'category_id': int(cls_id),
                 #'mask': class_map,
                 'polygon': polygon,
-                'area': np.sum(class_map > 0),
+                'area': int(np.sum(class_map > 0)),
             })
+        
 
 
         return result
@@ -90,21 +92,23 @@ class SegPredictor(object):
             # get mask
             offset_left = bbox[0] - crop_bbox[0]
             offset_top = bbox[1] - crop_bbox[1]
-            offset_right = offset_left + bbox[2] - bbox[0]
-            offset_bottom = offset_top + bbox[3] - bbox[1]
+            offset_right = offset_left + bbox[2]
+            offset_bottom = offset_top + bbox[3]
             class_map = class_map[int(offset_top):int(offset_bottom),
                              int(offset_left):int(offset_right)].astype(np.uint8)
             contours, _ = cv2.findContours(class_map, cv2.RETR_LIST,
                                         cv2.CHAIN_APPROX_SIMPLE)
             polygon = []
             for j in range(len(contours)):
+                if len(contours[j]) <= 4:
+                    continue
                 contours[j][..., 0] += int(bbox[0])
                 contours[j][..., 1] += int(bbox[1])
                 polygon.append(contours[j].flatten().tolist())
             img_data.pop('img', None)
             #img_data.pop('crop_box', None)
             img_data['polygon'] = polygon
-            img_data['area'] =  np.sum(class_map > 0)
+            img_data['area'] =  int(np.sum(class_map > 0))
 
             result.append(img_data)
 
@@ -140,6 +144,7 @@ class SegPredictor(object):
         with paddle.no_grad():
             for i, im_data in enumerate(img_lists[local_rank]):
                 data = preprocess(im_data, self.transforms)
+                #import pdb;pdb.set_trace()
                 if aug_pred:
                     pred, _ = infer.aug_inference(
                         self.model,
@@ -167,30 +172,6 @@ class SegPredictor(object):
                 else:
                     result = self.postprocess(pred, im_data)
                 results.extend(result)
-
-
-                # save added image
-                if self.visualize:
-                    # get the saved name
-                    if image_dir is not None:
-                        im_file = im_path.replace(image_dir, '')
-                    else:
-                        im_file = os.path.basename(im_path)
-                    if im_file[0] == '/' or im_file[0] == '\\':
-                        im_file = im_file[1:]
-
-                    added_image = utils.visualize.visualize(
-                        im_path, pred, color_map, weight=0.6)
-                    added_image_path = os.path.join(added_saved_dir, im_file)
-                    mkdir(added_image_path)
-                    cv2.imwrite(added_image_path, added_image)
-
-                    # save pseudo color prediction
-                    pred_mask = utils.visualize.get_pseudo_color_map(pred, color_map)
-                    pred_saved_path = os.path.join(
-                        pred_saved_dir, os.path.splitext(im_file)[0] + ".png")
-                    mkdir(pred_saved_path)
-                    pred_mask.save(pred_saved_path)
 
                 progbar_pred.update(i + 1)
         return results

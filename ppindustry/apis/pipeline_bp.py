@@ -104,9 +104,8 @@ class Pipeline(object):
             image_list.append(arr[start:end])
         return image_list
 
-    def run_ranks(self, input):
+    def run(self, input):
         image_list, input_type = self._parse_input(input)
-        
         nranks = paddle.distributed.get_world_size()
         local_rank = paddle.distributed.get_rank()
         if nranks > 1:
@@ -114,8 +113,8 @@ class Pipeline(object):
         else:
             img_lists = [image_list]
         results = []
-
         for i, im_data in enumerate(img_lists[local_rank]):
+            data_dict = {}
             output = self.predict_images(im_data)
             results.append(output)
             logger.info(
@@ -123,27 +122,16 @@ class Pipeline(object):
         all_results = []
         if local_rank == 0:
             paddle.distributed.all_gather_object(all_results, results)
-        
-
         return results
 
-    def run(self, input):
-        input, input_type = self._parse_input(input)
-        if input_type == "image" :
-            results = self.predict_images(input)
-        else:
-            raise ValueError("Unexpected input type: {}".format(input_type))
-        return results
-
-    def update(self, results, input):
+    def update(self, results):
         """"update model results"""
         outputs = []
         image_to_info = {}
-        for data_path in input:
-            image_to_info[data_path] = {'pred': [], 'isNG': 0}
         for pred in results:
             image_path = pred['image_path']
             pred.pop("image_path")
+            import pdb;pdb.set_trace()
             if  image_path not in image_to_info.keys():
                 image_to_info[image_path]= {'pred':[pred]}
             
@@ -228,13 +216,18 @@ class Pipeline(object):
 
 
     def predict_images(self, input):
+        import pdb;pdb.set_trace()
         results = self.modules.run(input)
-        results = self.update(results, input)
+        import pdb;pdb.set_trace()
+        results = self.update(results)
         if self.vis:
             self.show_result(results)
         if self.save: 
             with open(os.path.join(self.output_dir, 'output.json'), "w") as f: 
                 json.dump(results, f, indent=2) 
+
+
+        
 
         return results
 
