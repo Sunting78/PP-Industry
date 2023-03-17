@@ -44,31 +44,48 @@ class Builder(object):
             op = create(op_arch, op_cfg, env_cfg)
             self.op_name2op[op_arch] = op
 
-    def update_res(self, results, op_outputs, input_name):
-        # step1: remove the result when keys not used in later input
-        for res, out in zip(results, op_outputs):
-            if self.has_output_op:
-                del_name = []
-                for k in out.keys():
-                    if k not in self.input_dep:
-                        del_name.append(k)
-                # remove the result when keys not used in later input
-                for name in del_name:
-                    del out[name]
-            res.update(out)
 
-        # step2: if the input name is no longer used, then result will be deleted  
-        if self.has_output_op:
-            for name in input_name:
-                self.input_dep[name] -= 1
-                if self.input_dep[name] == 0:
-                    for res in results:
-                        del res[name]
+    def update(self, results, input):
+        """"update model results"""
+        image_to_info = {}
+        for data_path in input:
+            image_to_info[data_path] = {'pred': []}
+        for pred in results:
+            image_path = pred['image_path']
+            pred.pop("image_path")
+            pred.pop("image_id") if "image_id" in pred.keys() else None
+            if  image_path not in image_to_info.keys():
+                image_to_info[image_path]= {'pred':[pred]}
+            
+            else:
+                image_to_info[image_path]['pred'].append(pred)
+            
+            #if 'isNG' not in image_to_info[image_path].keys() or image_to_info[image_path]['isNG'] == 0:
+            #    image_to_info[image_path]['isNG'] = pred['isNG']
+
+            #if not image_to_info[image_path].get('isNG', 0):
+            #    image_to_info[image_path]['isNG'] = pred['isNG']
+
+        return image_to_info
+
 
     def run(self, input, frame_id=-1):
+        image_list = input
         # execute each operator according to toposort order
         for op_name, op in self.op_name2op.items():
+            if op_name == 'PostProcess':
+                input = self.update(result, image_list)
+
             result = op(input)
             input = result
+
+        for img_path, img_info in result.items():
+            preds = img_info['pred']
+            img_info['isNG']  = 0
+            for pred in preds:
+                if pred['isNG'] == 1:
+                    img_info['isNG'] = 1
+                    break
+            
         print(result)
         return result

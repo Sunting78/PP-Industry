@@ -134,29 +134,6 @@ class Pipeline(object):
         else:
             raise ValueError("Unexpected input type: {}".format(input_type))
         return results
-
-    def update(self, results, input):
-        """"update model results"""
-        outputs = []
-        image_to_info = {}
-        for data_path in input:
-            image_to_info[data_path] = {'pred': [], 'isNG': 0}
-        for pred in results:
-            image_path = pred['image_path']
-            pred.pop("image_path")
-            if  image_path not in image_to_info.keys():
-                image_to_info[image_path]= {'pred':[pred]}
-            
-            else:
-                image_to_info[image_path]['pred'].append(pred)
-            
-            #if 'isNG' not in image_to_info[image_path].keys() or image_to_info[image_path]['isNG'] == 0:
-            #    image_to_info[image_path]['isNG'] = pred['isNG']
-
-            if not image_to_info[image_path].get('isNG', 0):
-                image_to_info[image_path]['isNG'] = pred['isNG']
-
-        return image_to_info
         
 
     def show_result(self, results):
@@ -229,7 +206,7 @@ class Pipeline(object):
 
     def predict_images(self, input):
         results = self.modules.run(input)
-        results = self.update(results, input)
+        #results = self.update(results, input)
         if self.vis:
             self.show_result(results)
         if self.save: 

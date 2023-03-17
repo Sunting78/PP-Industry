@@ -34,11 +34,13 @@ class Detection(object):
         det_config = model_cfg['config_path']
         det_model = model_cfg['model_path']
         det_config = load_config(det_config)
+        self.score_threshold = self.model_cfg['score_threshold']
+
         #self.score_threshold = model_cfg['score_threshold']
         self.predictor = Predictor(det_config, mode='test')
         self.predictor.load_weights(det_model)
 
 
     def __call__(self, input):
-        results = self.predictor.predict(input, visualize=False)
+        results = self.predictor.predict(input, score_thresh=self.score_threshold, visualize=False)
         return results

@@ -27,7 +27,7 @@ logger = setup_logger('PostProcess')
 
 @register
 class PostProcess(object):
-    def __init__(self, model_cfg, env_cfg):
+    def __init__(self, model_cfg, env_cfg=None):
         super(PostProcess, self).__init__()
         self.env_cfg = env_cfg
         self.op_name2op = {}
@@ -65,21 +65,24 @@ class JudgeDetByScores(object):
         #mod = importlib.import_module(__name__)
 
     def __call__(self, inputs):
-        for pred in inputs:
-            if pred.get("isNG", 1):
-                if isinstance(self.score_threshold, dict):
-                    if pred['category_id'] in self.score_threshold.keys():
-                        threshold = self.score_threshold[pred['category_id']]
-                    else:  
-                        pred['judge'] = 'OK'
-                        continue
-                else: 
-                    threshold = self.score_threshold
-                
-                if pred['score'] < threshold:
-                    pred['isNG'] = 0
-                else:
-                    pred['isNG'] = 1
+
+        for img_path, img_info in inputs.items():
+            preds = img_info['pred']
+            for pred in preds:
+                if pred.get("isNG", 1):
+                    if isinstance(self.score_threshold, dict):
+                        if pred['category_id'] in self.score_threshold.keys():
+                            threshold = self.score_threshold[pred['category_id']]
+                        else:  
+                            pred['isNG'] = 0
+                            continue
+                    else: 
+                        threshold = self.score_threshold
+                    
+                    if pred['score'] < threshold:
+                        pred['isNG'] = 0
+                    else:
+                        pred['isNG'] = 1
 
         return inputs
 
@@ -91,21 +94,24 @@ class JudgeByLengthWidth(object):
         #mod = importlib.import_module(__name__)
 
     def __call__(self, inputs):
-        for pred in inputs:
-            if pred.get("isNG", 1):
-                if isinstance(self.len_thresh, dict):
-                    if pred['category_id'] in self.len_thresh.keys():
-                        threshold = self.len_thresh[pred['category_id']]
-                    else:  
+
+        for img_path, img_info in inputs.items():
+            preds = img_info['pred']
+            for pred in preds:
+                if pred.get("isNG", 1):
+                    if isinstance(self.len_thresh, dict):
+                        if pred['category_id'] in self.len_thresh.keys():
+                            threshold = self.len_thresh[pred['category_id']]
+                        else:  
+                            pred['isNG'] = 1
+                            continue
+                    else: 
+                        threshold = self.len_thresh
+                    
+                    if pred['bbox'][2] >= threshold or pred['bbox'][3] >= threshold:
                         pred['isNG'] = 1
-                        continue
-                else: 
-                    threshold = self.len_thresh
-                
-                if pred['bbox'][2] >= threshold or pred['bbox'][3] >= threshold:
-                    pred['isNG'] = 1
-                else:
-                    pred['isNG'] = 0
+                    else:
+                        pred['isNG'] = 0
 
         return inputs
 
@@ -117,25 +123,27 @@ class JudgeByArea(object):
         #mod = importlib.import_module(__name__)
 
     def __call__(self, inputs):
-        for pred in inputs:
-            if isinstance(self.area_thresh, dict):
-                if pred['category_id'] in self.area_thresh.keys():
-                    threshold = self.area_thresh[pred['category_id']]
-                else:  
-                    pred['judge'] = 'OK'
-                    continue
-            else: 
-                threshold = self.area_thresh
+        for img_path, img_info in inputs.items():
+            preds = img_info['pred']
+            for pred in preds:
+                if isinstance(self.area_thresh, dict):
+                    if pred['category_id'] in self.area_thresh.keys():
+                        threshold = self.area_thresh[pred['category_id']]
+                    else:  
+                        pred['isNG'] = 0
+                        continue
+                else: 
+                    threshold = self.area_thresh
 
-            if 'area' in pred.keys():
-                if pred['area'] >= threshold:
-                    pred['isNG'] = 1
-                else:
-                    pred['isNG'] = 0
-            elif 'bbox' in pred.keys():
-                if pred['bbox'][2] * pred['bbox'][3] >= threshold:
-                    pred['isNG'] = 1
-                else:
-                    pred['isNG'] = 0
+                if 'area' in pred.keys():
+                    if pred['area'] >= threshold:
+                        pred['isNG'] = 1
+                    else:
+                        pred['isNG'] = 0
+                elif 'bbox' in pred.keys():
+                    if pred['bbox'][2] * pred['bbox'][3] >= threshold:
+                        pred['isNG'] = 1
+                    else:
+                        pred['isNG'] = 0
 
         return inputs

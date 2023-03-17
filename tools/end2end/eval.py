@@ -14,6 +14,7 @@ import pycocotools.mask as mask_util
 
 from ppindustry.cvlib.configs import ConfigParser
 from ppindustry.cvlib.framework import Builder
+from ppindustry.ops.postprocess import PostProcess
 from tools.convert_tools.convert_coco_to_RoI_mask import read_json, group_images_annotations
 from ppindustry.utils.logger import setup_logger
 
@@ -66,9 +67,23 @@ def get_args():
 def evaluation(gt_data, preds_data, post_modules=None, image_root='', instance_level=None):
     
     ng_in_ok_num, ok_in_ng_num, ng_gt, ok_gt  = 0, 0, 0, 0
-    import pdb;pdb.set_trace()
+    if post_modules:
+        for img_path, img_info in preds_data.items():
+            preds = img_info['pred']
+            img_info.pop('isNG')
+            for pred in preds:
+                pred.pop('isNG')
+        preds_data = post_modules(preds_data)
+        for img_path, img_info in preds_data.items():
+            preds = img_info['pred']
+            img_info['isNG']  = 0
+            for pred in preds:
+                if pred['isNG'] == 1:
+                    img_info['isNG'] = 1
+                    break
+    
     for img_path, img_preds in preds_data.items():
-        img_gt_anno =  gt_data[img_path] 
+        img_gt_anno =  gt_data[os.path.join(image_root, os.path.basename(img_path))] 
         if len(img_gt_anno) == 0: 
             ok_gt+=1
             if img_preds['isNG']:
@@ -98,23 +113,17 @@ def evaluation(gt_data, preds_data, post_modules=None, image_root='', instance_l
 
 
 
-
-
     
-
-
-
 
 if __name__ == '__main__':
     args = get_args()
     data = read_json(args.input_path)
     img_to_gt_annos = group_images_annotations(data)
     img_to_pred_annos = read_json(args.pred_path)
-    import pdb;pdb.set_trace()
     if args.rules_eval:
         config = ConfigParser(args)
         postprocess = config.parse()[0][-1]
-        post_modules = Builder(postprocess['PostProcess'])
+        post_modules = PostProcess(postprocess['PostProcess'])
     
     evaluation(img_to_gt_annos, img_to_pred_annos, post_modules, args.image_root, args.instance_eval)
 

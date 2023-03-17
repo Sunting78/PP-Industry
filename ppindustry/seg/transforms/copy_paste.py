@@ -98,7 +98,7 @@ class CopyPaste:
         return data
 
     def __call__(self, data):
-        data_new = copy.deep_copy(data)
+        #data_new = copy.deep_copy(data)
 
         if np.random.random() <= self.copy_prob and len(self.memory_bank) > 0:
             data = self.copy_and_paste(data)

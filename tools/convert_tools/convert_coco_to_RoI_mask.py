@@ -82,6 +82,8 @@ def generate_mask_RoI(img_to_anno, image_root, output_path, suffix, pad_scale=0.
     _mkdir_p(output_anno_path)
 
     for img_path, annos in img_to_anno.items():
+        if len(annos) == 0:
+            continue
         img = cv2.imread(osp.join(image_root, img_path))
         base_name = os.path.basename(img_path).split('.')[0]
         polygons = []
@@ -109,10 +111,11 @@ def read_json(json_path):
 
 def group_images_annotations(data, class_id=None):
     id_to_img = {}
+    img_to_annos = {}
     for img in data["images"]:
         id_to_img[img["id"]] = img['file_name']
+        img_to_annos[img['file_name']] = []
 
-    img_to_annos = {}
     for anno in data["annotations"]:
         if anno.get('iscrowd', 1):
             continue

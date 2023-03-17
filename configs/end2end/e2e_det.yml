@@ -7,9 +7,10 @@ PipeLine:
   - Detection:
       config_path: ./configs/det/hrnet/faster_rcnn_hrnetv2p_w18_1x_defect.yml
       model_path: ./output/faster_rcnn_hrnetv2p_w18_1x_defect/model_final.pdparams
-      classes: [1]
+      #classes: [1]
+      score_threshold: 0.01
   - PostProcess:
       - JudgeDetByScores:
-          score_threshold: {1: 0.5} #{class_id or name: threshold}
+          score_threshold: {1: 0.1} #{class_id or name: threshold}
       - JudgeByLengthWidth:
           len_thresh: 10 # smaller than it is OK sample
