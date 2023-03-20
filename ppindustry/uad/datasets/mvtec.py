@@ -7,23 +7,22 @@ from paddle.vision import transforms as T
 
 from ppindustry.cvlib.workspace import register
 
-# URL = 'ftp://guest:GU.205dldo@ftp.softronics.ch/mvtec_anomaly_detection/mvtec_anomaly_detection.tar.xz'
-CLASS_NAMES = ['bottle', 'cable', 'capsule', 'carpet', 'grid',
-               'hazelnut', 'leather', 'metal_nut', 'pill', 'screw',
-               'tile', 'toothbrush', 'transistor', 'wood', 'zipper']
+
+textures = ['carpet', 'grid', 'leather', 'tile', 'wood']
+objects = ['bottle','cable', 'capsule','hazelnut', 'metal_nut',
+            'pill', 'screw', 'toothbrush', 'transistor', 'zipper']
+CLASS_NAMES = textures+objects
 
 @register
 class MVTecDataset(Dataset):
     def __init__(self, dataset_root_path='/root/data/mvtec', class_name='bottle', is_train=True,
-                 resize=256, cropsize=224):
+                 resize=[256, 256], cropsize=[224, 224]):
         assert class_name in CLASS_NAMES, 'class_name: {}, should be in {}'.format(class_name, CLASS_NAMES)
         self.dataset_root_path = dataset_root_path
         self.class_name = class_name
         self.is_train = is_train
         self.resize = resize
         self.cropsize = cropsize
-        # self.mvtec_folder_path = os.path.join(root_path, 'mvtec_anomaly_detection')
-
 
         # load dataset
         self.x, self.y, self.mask = self.load_dataset_folder()
@@ -45,11 +44,13 @@ class MVTecDataset(Dataset):
         x = self.transform_x(x)
 
         if y == 0:
-            mask = paddle.zeros([1, self.cropsize, self.cropsize])
+            mask = paddle.zeros([1, self.cropsize[0], self.cropsize[1]])
         else:
             mask = Image.open(mask)
             mask = self.transform_mask(mask)
 
+        if self.is_train:
+            return x
         return x, y, mask
 
     def __len__(self):
@@ -89,3 +90,15 @@ class MVTecDataset(Dataset):
         assert len(x) == len(y), 'number of x and y should be same'
 
         return list(x), list(y), list(mask)
+
+    @staticmethod
+    def get_transform(resize=256, cropsize=256):
+        transform_x = T.Compose([T.Resize(resize),
+                                 T.CenterCrop(cropsize),
+                                 T.ToTensor(),
+                                 T.Normalize(mean=[0.485, 0.456, 0.406],
+                                             std=[0.229, 0.224, 0.225])])
+        transform_mask = T.Compose([T.Resize(resize),
+                                    T.CenterCrop(cropsize),
+                                    T.ToTensor()])
+        return transform_x, transform_mask

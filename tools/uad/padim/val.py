@@ -4,6 +4,7 @@ import random
 import argparse
 import datetime
 import numpy as np
+import pandas as pd
 from tqdm import tqdm
 from random import sample
 from collections import OrderedDict
@@ -21,26 +22,38 @@ import paddle
 import paddle.nn.functional as F
 from paddle.io import DataLoader
 
-parent_path = os.path.abspath(os.path.join(__file__, *(['..']*3)))
+parent_path = os.path.abspath(os.path.join(__file__, *(['..']*4)))
 sys.path.insert(0, parent_path)
 import ppindustry.uad.datasets.mvtec as mvtec
-from ppindustry.uad.models.resnet import ResNet_PaDiM
+from ppindustry.uad.models.padim import ResNet_PaDiM
 from ppindustry.cvlib.uad_configs import *
 
+
+textures = ['carpet', 'grid', 'leather', 'tile', 'wood']
+objects = ['bottle', 'cable', 'capsule', 'hazelnut', 'metal_nut',
+           'pill', 'screw', 'toothbrush', 'transistor', 'zipper']
+CLASS_NAMES = textures + objects
+fins = {"resnet18": 448, "resnet50": 1792, "wide_resnet50_2": 1792}
 
 def argsparser():
     parser = argparse.ArgumentParser('PaDiM')
     parser.add_argument("--config", type=str, default=None, help="Path of config", required=True)
-    parser.add_argument("--device", type=str, default='gpu')
-    parser.add_argument('--data_path', type=str, default='/ssd1/zhaoyantao/PP-Industry/data/mvtec_anomaly_detection')
-    parser.add_argument('--save_path', type=str, default='/ssd1/zhaoyantao/PP-Industry/output')
-    parser.add_argument('--model_path', type=str, default='/ssd1/zhaoyantao/PP-Industry/output/bottle/best.pdparams')
-    parser.add_argument("--category", type=str , default='bottle', help="category name for MvTec AD dataset")
-    parser.add_argument('--batch_size', type=int, default=1)
-    parser.add_argument("--depth", type=int, default=18, help="resnet depth")
-    parser.add_argument("--save_picture", type=bool, default=True)
+    parser.add_argument("--device", type=str, default=None)
+    parser.add_argument("--batch_size", type=int, default=None)
+    parser.add_argument('--num_workers', type=int, default=None)
+    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument("--data_path", type=str, default=None)
+    parser.add_argument("--save_path", type=str, default=None)
+    parser.add_argument("--category", type=str, default=None)
+    parser.add_argument('--resize', type=list or tuple, default=None)
+    parser.add_argument('--crop_size', type=list or tuple, default=None)
+    parser.add_argument("--backbone", type=str, default=None,
+                        help="backbone model arch, one of [resnet18, resnet50, wide_resnet50_2]")
+    parser.add_argument("--do_val", type=bool, default=None)
+    parser.add_argument("--save_pic", type=bool, default=None)
+
+    parser.add_argument("--save_model", type=bool, default=True)
     parser.add_argument("--print_freq", type=int, default=20)
-    parser.add_argument("--seed", type=int, default=3)
     return parser.parse_args()
 
 
@@ -50,26 +63,36 @@ def main():
     args = config_parser.parser()
 
     random.seed(args.seed)
+    np.random.seed(args.seed)
     paddle.seed(args.seed)
+    paddle.device.set_device(args.device)
 
+    result = []
+    assert args.category in mvtec.CLASS_NAMES
+    csv_columns = ['category', 'Image_AUROC', 'Pixel_AUROC']
+    csv_name = os.path.join(args.save_path + args.backbone,
+                            '{}_seed{}.csv'.format(args.category, args.seed))
     # build model
-    model = ResNet_PaDiM(depth=args.depth, pretrained=False).to(args.device)
+    model = ResNet_PaDiM(arch=args.backbone, pretrained=False)
     state = paddle.load(args.model_path)
     model.model.set_dict(state["params"])
     model.distribution = state["distribution"]
     model.eval()
 
-    t_d, d = 448, 100 # "resnet18": {"orig_dims": 448, "reduced_dims": 100, "emb_scale": 4},
+    t_d, d = fins[args.backbone], 100 # "resnet18": {"orig_dims": 448, "reduced_dims": 100, "emb_scale": 4}
+    idx = paddle.to_tensor(sample(range(0, t_d), d))
     class_name = args.category
-    assert class_name in mvtec.CLASS_NAMES
     print("Eval model for {}".format(class_name))
 
     # build datasets
-    test_dataset = mvtec.MVTecDataset(args.data_path, class_name=class_name, is_train=False)
-    test_dataloader = DataLoader(test_dataset, batch_size=args.batch_size)
-
-    idx = paddle.to_tensor(sample(range(0, t_d), d))
-    val(args, model, test_dataloader, class_name, idx)
+    test_dataset = mvtec.MVTecDataset(args.data_path, class_name=class_name, is_train=False,
+                                      resize=args.resize, cropsize=args.crop_size)
+    test_dataloader = DataLoader(test_dataset, batch_size=args.batch_size, num_workers=args.num_workers)
+    result.append([class_name, *val(args, model, test_dataloader, class_name, idx)])
+    result = pd.DataFrame(result, columns=csv_columns).set_index('category')
+    print(result)
+    print("Evaluation result saved at{}:".format(csv_name))
+    result.to_csv(csv_name)
 
 
 def val(args, model, test_dataloader, class_name, idx):
@@ -148,7 +171,6 @@ def val(args, model, test_dataloader, class_name, idx):
     max_score = score_map.max()
     min_score = score_map.min()
     scores = (score_map - min_score) / (max_score - min_score)
-    debug_score = scores[0]
 
     # calculate image-level ROC AUC score
     img_scores = scores.reshape(scores.shape[0], -1).max(axis=1)
@@ -169,18 +191,14 @@ def val(args, model, test_dataloader, class_name, idx):
     fpr, tpr, _ = roc_curve(gt_mask.flatten(), scores.flatten())
     per_pixel_rocauc = roc_auc_score(gt_mask.flatten(), scores.flatten())
     total_pixel_roc_auc.append(per_pixel_rocauc)
-    if args.save_picture:
-        save_name = os.path.join(args.save_path, args.category)
+
+    if args.save_pic:
+        save_name = os.path.join(args.save_path, args.backbone, args.category)
         dir_name = os.path.dirname(save_name)
         if dir_name and not os.path.exists(dir_name):
             os.makedirs(dir_name)
         plot_fig(test_imgs, scores, gt_mask_list, threshold, save_name, class_name)
-
-    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '\t' +
-          'Class:{}'.format(class_name) +':\t'+ 'Image AUC: %.3f' % np.mean(total_roc_auc))
-    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '\t' +
-          'Class:{}'.format(class_name) +':\t'+ 'Pixel AUC: %.3f' % np.mean(total_pixel_roc_auc))
-
+    return np.mean(total_roc_auc), np.mean(total_pixel_roc_auc)
 
 def plot_fig(test_img, scores, gts, threshold, save_dir, class_name):
     num = len(scores)

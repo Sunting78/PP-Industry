@@ -17,25 +17,28 @@ import paddle
 import paddle.nn.functional as F
 from paddle.vision import transforms as T
 
-parent_path = os.path.abspath(os.path.join(__file__, *(['..']*3)))
+parent_path = os.path.abspath(os.path.join(__file__, *(['..']*4)))
 sys.path.insert(0, parent_path)
 import ppindustry.uad.datasets.mvtec as mvtec
-from ppindustry.uad.models.resnet import ResNet_PaDiM
+from ppindustry.uad.models.padim import ResNet_PaDiM
 from ppindustry.cvlib.uad_configs import *
 
 
 def argsparser():
     parser = argparse.ArgumentParser('PaDiM')
     parser.add_argument("--config", type=str, default=None, help="Path of config", required=True)
-    parser.add_argument("--device", type=str, default='gpu')
-    parser.add_argument('--img_path', type=str, default='/ssd1/zhaoyantao/PP-Industry/data/mvtec_anomaly_detection/bottle/test/broken_large/000.png')
-    parser.add_argument('--save_path', type=str, default='/ssd1/zhaoyantao/PP-Industry/output')
-    parser.add_argument('--model_path', type=str, default='/ssd1/zhaoyantao/PP-Industry/output/bottle/best.pdparams')
-    parser.add_argument("--category", type=str , default='bottle', help="category name for MvTec AD dataset")
-    parser.add_argument("--depth", type=int, default=18, help="resnet depth")
-    parser.add_argument("--save_picture", type=bool, default=True)
-    parser.add_argument("--seed", type=int, default=3)
-    parser.add_argument("--threshold", type=float, default=0.5)
+    parser.add_argument("--device", type=str, default=None)
+    parser.add_argument('--img_path', type=str, default=None)
+    parser.add_argument('--save_path', type=str, default=None)
+    parser.add_argument('--model_path', type=str, default=None)
+    parser.add_argument("--category", type=str , default=None, help="category name for MvTec AD dataset")
+    parser.add_argument("--backbone", type=str, default=None)
+    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument("--threshold", type=float, default=None)
+    parser.add_argument('--resize', type=list or tuple, default=None)
+    parser.add_argument('--crop_size', type=list or tuple, default=None)
+
+    parser.add_argument("--save_pic", type=bool, default=True)
     return parser.parse_args()
 
 
@@ -45,10 +48,12 @@ def main():
     args = config_parser.parser()
 
     random.seed(args.seed)
+    np.random.seed(args.seed)
     paddle.seed(args.seed)
+    paddle.device.set_device(args.device)
 
     # build model
-    model = ResNet_PaDiM(depth=args.depth, pretrained=False).to(args.device)
+    model = ResNet_PaDiM(arch=args.backbone, pretrained=False)
     state = paddle.load(args.model_path)
     model.model.set_dict(state["params"])
     model.distribution = state["distribution"]
@@ -60,8 +65,8 @@ def main():
     print("Testing model for {} with sigle picture".format(class_name))
 
     # build datasets
-    transform_x = T.Compose([ T.Resize(256),
-                              T.CenterCrop(224),
+    transform_x = T.Compose([ T.Resize(args.resize),
+                              T.CenterCrop(args.crop_size),
                               T.ToTensor(),
                               T.Normalize(mean=[0.485, 0.456, 0.406],
                                           std=[0.229, 0.224, 0.225])])
@@ -83,7 +88,6 @@ def main():
 
     # Embedding concat
     embedding_vectors = test_outputs['layer1']
-    # print(embedding_vectors)
     for layer_name in ['layer2', 'layer3']:
         layer_embedding = test_outputs[layer_name]
         layer_embedding = F.interpolate(layer_embedding, size=embedding_vectors.shape[-2:], mode="nearest")
@@ -95,7 +99,6 @@ def main():
     # calculate distance matrix
     B, C, H, W = embedding_vectors.shape
     embedding = embedding_vectors.reshape((B, C, H * W))
-    # print("embedding",embedding)
     # calculate mahalanobis distances
     mean, covariance = paddle.to_tensor(model.distribution[0]), paddle.to_tensor(model.distribution[1])
     inv_covariance = paddle.linalg.inv(covariance.transpose((2, 0, 1)))
@@ -107,11 +110,8 @@ def main():
     distances = paddle.sqrt(distances)
 
     # upsample
-    # dist_list = paddle.to_tensor(distances)
     score_map = F.interpolate(distances.unsqueeze(1), size=x.shape[2:], mode='bilinear',
                               align_corners=False).squeeze(1).numpy()
-
-
     # apply gaussian smoothing on the score map
     for i in range(score_map.shape[0]):
         score_map[i] = gaussian_filter(score_map[i], sigma=4)
@@ -121,8 +121,8 @@ def main():
     min_score = score_map.min()
     scores = (score_map - min_score) / (max_score - min_score)
 
-    if args.save_picture:
-        save_name = os.path.join(args.save_path, args.category)
+    if args.save_pic:
+        save_name = os.path.join(args.save_path, args.backbone, args.category)
         dir_name = os.path.dirname(save_name)
         if dir_name and not os.path.exists(dir_name):
             os.makedirs(dir_name)

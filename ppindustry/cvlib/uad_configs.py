@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved.
+# Copyright (c) 2023 PaddlePaddle Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,7 +36,8 @@ class ConfigParser(object):
     def merge_cfg(self, args, cfg):
         args_dict = vars(args)
         for k, v in args_dict.items():
-            cfg[k] = v
+            if v is not None:
+                cfg[k] = v
         return cfg
 
     def check_cfg(self):
@@ -48,7 +49,7 @@ class ConfigParser(object):
         return Dic2Obj(self.cfg)
 
     def print_cfg(self):
-        print('------------- Common Arguments ---------------')
+        print('------------- Config Arguments ---------------')
         buffer = yaml.dump(self.cfg)
         print(buffer)
         print('---------------------------------------------')
