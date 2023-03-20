@@ -1,8 +1,8 @@
 # 1 准备数据集
 
-对于工业的数据集，大家只需要下载并存按照PaddleDetection(https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.6/docs/tutorials/data/PrepareDetDataSet.md)或PaddleSeg(https://github.com/PaddlePaddle/PaddleSeg/blob/develop/docs/data/marker/marker_cn.md)的指引放到特定目录，就可以进行模型训练和全流程预测。
+对于工业的数据集，大家只需要下载并存按照[PaddleDetection数据准备](https://github.com/PaddlePaddle/PaddleDetection/blob/release/2.6/docs/tutorials/data/PrepareDetDataSet.md)或[PaddleSeg数据准备](https://github.com/PaddlePaddle/PaddleSeg/blob/develop/docs/data/marker/marker_cn.md)的指引放到特定目录，就可以进行模型训练和全流程预测。
 
-# 2. 举例：Magnetic tile defect datasets
+# 2 举例：Magnetic tile defect datasets
 
 ## 2.1 公开数据集下载
 
