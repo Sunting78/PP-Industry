@@ -1,15 +1,14 @@
 ENV:
   device: GPU
-  output: ./tmp/
+  output_dir: ./tmp/
   save: True
-  visualize: True
+  visualize: False
 
 PipeLine:
   - BaseSegmentation:
       config_path: ./configs/seg/ocrnet/ocrnet_hrnetw18_ksdd2.yml 
-      model_path: ./output/ksdd2/iter_160000/model.pdparams
+      model_path: ./output/ksdd2/best_model/model.pdparams
       aug_pred : False
-      visualize: False
   - PostProcess:
       - JudgeByArea:
-          area_thresh: 100
+          area_thresh: 10

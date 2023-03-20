@@ -47,6 +47,8 @@ class Pipeline(object):
         local_rank = paddle.distributed.get_rank()
         self.modules = Builder(self.model_cfg, self.env_cfg)
         self.output_dir = self.env_cfg.get('output_dir', 'output')
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
         self.vis = self.env_cfg.get('visualize', False)
         self.save = self.env_cfg.get('save', False)
 
@@ -209,6 +211,7 @@ class Pipeline(object):
         #results = self.update(results, input)
         if self.vis:
             self.show_result(results)
+
         if self.save: 
             with open(os.path.join(self.output_dir, 'output.json'), "w") as f: 
                 json.dump(results, f, indent=2) 
