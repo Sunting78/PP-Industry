@@ -22,6 +22,7 @@ import paddle
 import ppindustry
 from ppindustry.cvlib.workspace import create
 from ppindustry.ops import *
+from ppindustry.utils.data_dict import post_process_image_info
 from ppindustry.utils.helper import gen_input_name, get_output_keys
 
 
@@ -69,23 +70,18 @@ class Builder(object):
         return image_to_info
 
 
+
     def run(self, input, frame_id=-1):
         image_list = input
         # execute each operator according to toposort order
         for op_name, op in self.op_name2op.items():
             if op_name == 'PostProcess':
                 input = self.update(result, image_list)
-
             result = op(input)
             input = result
+        
+        post_process_image_info(result)
 
-        for img_path, img_info in result.items():
-            preds = img_info['pred']
-            img_info['isNG']  = 0
-            for pred in preds:
-                if pred['isNG'] == 1:
-                    img_info['isNG'] = 1
-                    break
             
         print(result)
         return result

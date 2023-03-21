@@ -31,7 +31,7 @@ python3 tools/convert_tools/convert_mask_to_roi.py \
         --anno_path ./dataset/kolektor2/anno/val \
         --class_num 1 \
         --output_path output \
-        --suffix _GT
+        --suffix _GT.png
         --to_binary
 ```
 

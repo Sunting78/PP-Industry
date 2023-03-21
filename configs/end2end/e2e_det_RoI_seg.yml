@@ -1,17 +1,18 @@
 ENV:
   device: GPU
-  output: ./tmp/
+  output_dir: ./tmp/
   save: True
-  visualize: True
+  visualize: False
 PipeLine:
   - Detection:
       config_path: ./configs/det/hrnet/faster_rcnn_hrnetv2p_w18_1x_defect.yml
       model_path: ./output/faster_rcnn_hrnetv2p_w18_1x_defect/model_final.pdparams
+      score_threshold: 0.01
   - CropSegmentation:
       pad_scale: 0.5
       crop_score_thresh: {1: 0.3}  #{class: score}
       config_path: ./configs/seg/ocrnet/ocrnet_hrnetw18_ksdd2.yml 
-      model_path: ./output/ROI_seg/iter_16000/model.pdparams
+      model_path: ./output/ROI/iter_80000/model.pdparams
       aug_pred : False
   - PostProcess:
       - JudgeDetByScores:

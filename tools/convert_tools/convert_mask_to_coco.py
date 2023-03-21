@@ -17,8 +17,8 @@ import json
 import os
 import os.path as osp
 
-import numpy as np
 import cv2
+import numpy as np
 
 
 def get_args():
@@ -27,7 +27,6 @@ def get_args():
     """
     parser = argparse.ArgumentParser(
         description='Mask Format convert to Json for detection')
-
     # Parameters
     parser.add_argument(
         '--image_path',
@@ -49,7 +48,7 @@ def get_args():
     parser.add_argument(
         '--suffix',
         type=str,
-        default='',
+        default='.png',
         help='the gt suffix to img'
     )
     parser.add_argument(
@@ -58,22 +57,16 @@ def get_args():
         default='coco.json',
         help='output path to save coco format json'
     )
-
-    args = parser.parse_args()
-
-    return args
-
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
     args = get_args()
     image_path = args.image_path
     anno_path = args.anno_path
-    class_num = args.class_num
-    suffix = args.suffix
     output_name = args.output_name
 
-    classid_list = list(range(1, class_num + 1))
+    classid_list = list(range(1, args.class_num + 1))
     images = []
     annotations = []
     image_id = 0
@@ -89,15 +82,13 @@ if __name__ == '__main__':
                     'height': img.shape[0],
         }
         images.append(image_info)
-
-        anno_name = osp.join(anno_path, img_name.split('.')[0] + suffix + '.png')
+        basename = osp.splitext(img_name)[0]
+        anno_name = osp.join(anno_path, basename + args.suffix )
         mask = cv2.imread(anno_name, -1)
-        
         if mask.sum() == 0: 
             continue
         
         for cls_id in classid_list:  
-
             class_map = np.equal(mask, cls_id).astype(np.uint8)
             if class_map.sum()==0:
                 continue   
@@ -105,7 +96,6 @@ if __name__ == '__main__':
             for i, stat in enumerate(stats):
                 if i == 0:
                     continue # skip background
-
                 anno = {}
                 polygon = []
                 contours, _ = cv2.findContours((labels == i).astype(np.uint8), 
@@ -124,11 +114,10 @@ if __name__ == '__main__':
                 }
                 annotations.append(anno)
                 
-    categories = [{
-                    'supercategory': 'defect',
+    categories = [{'supercategory': 'defect',
                     'id': cls_id, 
-                    'name': str(cls_id)}  for cls_id in classid_list
-                ]
+                    'name': str(cls_id)}  for cls_id in classid_list]
+
     json_data = {'images': images, 'annotations': annotations, 'categories': categories}
     with open(output_name, "w") as f:
         json.dump(json_data, f, indent=2)

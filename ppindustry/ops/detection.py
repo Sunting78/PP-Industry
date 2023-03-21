@@ -34,7 +34,9 @@ class Detection(object):
         det_config = model_cfg['config_path']
         det_model = model_cfg['model_path']
         det_config = load_config(det_config)
-        self.score_threshold = self.model_cfg['score_threshold']
+        self.score_threshold = 0
+        if 'score_threshold' in self.model_cfg.keys():
+            self.score_threshold = self.model_cfg['score_threshold']
 
         #self.score_threshold = model_cfg['score_threshold']
         self.predictor = Predictor(det_config, mode='test')

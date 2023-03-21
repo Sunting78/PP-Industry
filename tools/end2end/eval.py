@@ -17,6 +17,7 @@ from ppindustry.cvlib.framework import Builder
 from ppindustry.ops.postprocess import PostProcess
 from tools.convert_tools.convert_coco_to_RoI_mask import read_json, group_images_annotations
 from ppindustry.utils.logger import setup_logger
+from ppindustry.utils.data_dict import post_process_image_info
 
 logger = setup_logger('Eval')
 
@@ -74,39 +75,39 @@ def evaluation(gt_data, preds_data, post_modules=None, image_root='', instance_l
             for pred in preds:
                 pred.pop('isNG')
         preds_data = post_modules(preds_data)
-        for img_path, img_info in preds_data.items():
-            preds = img_info['pred']
-            img_info['isNG']  = 0
-            for pred in preds:
-                if pred['isNG'] == 1:
-                    img_info['isNG'] = 1
-                    break
+        post_process_image_info(preds_data)
     
-    for img_path, img_preds in preds_data.items():
+    for img_path, img_info in preds_data.items():
         img_gt_anno =  gt_data[os.path.join(image_root, os.path.basename(img_path))] 
         if len(img_gt_anno) == 0: 
             ok_gt+=1
-            if img_preds['isNG']:
+            if img_info['isNG']:
                 ng_in_ok_num+=1
         else:  
             ng_gt+=1
-            if not img_preds['isNG']:
+            if not img_info['isNG']:
                 ok_in_ng_num+=1
+
+        if instance_level:
+            ng_in_ok_ins_num, ok_in_ng_ins_num, ng_ins_gt, ok_ins_gt  = 0, 0, 0, 0
+            
+
     
-    column_names = ["Eval", "OK", "NG"]
+    column_names = ["Eval", "GT OK", "GT NG"]
     table = pt.PrettyTable(column_names)
     table.add_row([
         "pred OK", ok_gt - ng_in_ok_num, ok_in_ng_num
     ])
     table.add_row(["pred NG", ng_in_ok_num, ng_gt - ok_in_ng_num])
-
+    print(table)
+    table = pt.PrettyTable(['Image-Level', 'scores'])
     table.add_row([
         "Overkill", "{:.2f}%".format((ng_in_ok_num / ok_gt) * 100) if ok_gt > 0 else 0,
-       " "
+    
     ])
     table.add_row([
         "Escape", "{:.2f}%".format((ok_in_ng_num / ng_gt) * 100) if ng_gt > 0 else 0,
-       " "
+    
     ])
     print(table)
 

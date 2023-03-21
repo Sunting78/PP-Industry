@@ -2,7 +2,7 @@ ENV:
   device: GPU
   output: ./tmp/
   save: True
-  visualize: True
+  visualize: False
 PipeLine:
   - Detection:
       config_path: ./configs/det/hrnet/faster_rcnn_hrnetv2p_w18_1x_defect.yml

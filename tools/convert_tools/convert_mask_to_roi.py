@@ -15,8 +15,9 @@ import argparse
 import os
 import os.path as osp
 
-import numpy as np
 import cv2
+import numpy as np
+
 
 def _mkdir_p(path):
     """Make the path exists"""
@@ -97,8 +98,8 @@ def get_args():
     parser.add_argument(
         '--suffix',
         type=str,
-        default='',
-        help='the gt suffix to img'
+        default='.png',
+        help='the gt suffix to img basename without extsion'
     )
     parser.add_argument(
         '--pad_scale',
@@ -112,30 +113,22 @@ def get_args():
         default='./output/',
         help='save path to save RoI, Mask and txt list, output_path/images/, output_path/anno/ and output_path/RoI.txt'
     )
-
-    args = parser.parse_args()
-
-    return args
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
     args = get_args()
     image_path = args.image_path
     anno_path = args.anno_path
-    class_num = args.class_num
     suffix = args.suffix
     output_path = args.output_path
-    pad_scale = args.pad_scale
-    to_binary = args.to_binary
 
-    
     output_image_path = osp.join(output_path, 'images')
     _mkdir_p(output_image_path)
     output_anno_path = osp.join(output_path, 'anno')
     _mkdir_p(output_anno_path)
 
-
-    classid_list = list(range(1, class_num + 1)) 
+    classid_list = list(range(1, args.class_num + 1)) 
     file_list = osp.join(output_path, 'RoI.txt')
     f = open(file_list, "w")
 
@@ -144,7 +137,7 @@ if __name__ == '__main__':
         img = cv2.imread(file_name)
 
         base_name = img_name.split('.')[0]
-        anno_name = osp.join(anno_path, base_name + suffix + '.png')
+        anno_name = osp.join(anno_path, base_name + suffix)
         mask = cv2.imread(anno_name, -1)
 
         if mask.sum() == 0: 
@@ -159,14 +152,14 @@ if __name__ == '__main__':
             for i, stat in enumerate(stats):
                 if i == 0: 
                     continue
-                bbox = adjust_bbox([int(stat[0]), int(stat[1]), int(stat[0]+stat[2]), int(stat[1]+stat[3])], img.shape[:2], pad_scale=pad_scale)
+                bbox = adjust_bbox([int(stat[0]), int(stat[1]), int(stat[0]+stat[2]), int(stat[1]+stat[3])], img.shape[:2], pad_scale=args.pad_scale)
                 img_crop = img[bbox[1]:bbox[3], bbox[0]:bbox[2], :]
                 mask_crop = mask[bbox[1]:bbox[3], bbox[0]:bbox[2]]
-                if to_binary:
+                if args.to_binary:
                     mask_crop[mask_crop>0] = 1
                 # save crop img, mask and write to txt file
                 img_save_path = osp.join(output_image_path, f'{base_name}_{cls_id}_{i}.png')
-                anno_save_path = osp.join(output_anno_path, f'{base_name}_{cls_id}_{i}{suffix}.png')
+                anno_save_path = osp.join(output_anno_path, f'{base_name}_{cls_id}_{i}{suffix}')
                 cv2.imwrite(img_save_path, img_crop)
                 cv2.imwrite(anno_save_path, mask_crop)
 
