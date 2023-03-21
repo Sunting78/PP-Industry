@@ -12,13 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import argparse
-import json
 import os
 import os.path as osp
+import sys
+parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 3)))
+sys.path.insert(0, parent_path)
 
 import cv2
 import numpy as np
+from pycocotools.coco import COCO
 import pycocotools.mask as mask_util
+
+from ppindustry.utils.bbox_utils import adjust_bbox
 
 
 def _mkdir_p(path):
@@ -26,71 +31,33 @@ def _mkdir_p(path):
     if not osp.exists(path):
         os.makedirs(path)
 
-def square(bbox, size):
-    x1, y1, x2, y2 = bbox
-    w, h = x2 - x1 + 1, y2 - y1 + 1
-    if w < h:
-        pad = (h - w) // 2
-        x1 = max(0, x1 - pad)
-        x2 = min(size[1], x2 + pad)
-    else:
-        pad = (w - h) // 2
-        y1 = max(0, y1 - pad)
-        y2 = min(size[0], y2 + pad)
-    return x1, y1, x2, y2
-
-
-def pad(bbox, img_size, pad_scale=0.0):
-    """pad bbox with scale
-    Args:
-        bbox (list):[x1, y1, x2, y2]
-        img_size (tuple): (height, width)
-        pad_scale (float): scale for padding
-    Return:
-        bbox (list)
-    """
-    x1, y1, x2, y2 = bbox
-    w, h = x2 - x1 + 1, y2 - y1 + 1
-    dw = int(w * pad_scale)
-    dh = int(h * pad_scale)
-    x1 = max(0, x1 - dw)
-    x2 = min(img_size[1], x2 + dw)
-    y1 = max(0, y1 - dh)
-    y2 = min(img_size[0], y2 + dh)
-    return int(x1), int(y1), int(x2), int(y2)
-
-
-def adjust_bbox(bbox, img_shape, pad_scale=0.0):
-    bbox = square(bbox, img_shape)
-    bbox = pad(bbox, img_shape, pad_scale)
-    return bbox
-
 def polygons_to_bitmask(polygons, height, width):
     if len(polygons) == 0:
         # COCOAPI does not support empty polygons
         return np.zeros((height, width)).astype(int)
-
     rles = mask_util.frPyObjects(polygons, height, width)
     rle = mask_util.merge(rles)
-
     return mask_util.decode(rle).astype(int)
 
-def generate_mask_RoI(img_to_anno, image_root, output_path, suffix, pad_scale=0.5):
+def generate_mask_RoI(data, image_root, output_path, suffix, class_id=None, pad_scale=0.5):
     output_image_path = osp.join(output_path, 'images')
     _mkdir_p(output_image_path)
     output_anno_path = osp.join(output_path, 'anno')
     _mkdir_p(output_anno_path)
 
-    for img_path, annos in img_to_anno.items():
+    img_ids = list(sorted(data.imgs.keys()))
+    for img_id in img_ids:
+        im_info = data.loadImgs(img_id)[0]
+        ann_ids = data.getAnnIds(imgIds=img_id, catIds=class_id, iscrowd=False)
+        annos = data.loadAnns(ann_ids)
         if len(annos) == 0:
             continue
-        img = cv2.imread(osp.join(image_root, img_path))
-        base_name = os.path.basename(img_path).split('.')[0]
+        img = cv2.imread(osp.join(image_root, im_info['file_name']))
+        base_name = os.path.basename(im_info['file_name']).split('.')[0]
         polygons = []
         for anno in annos:
             polygons.extend(anno['segmentation'])
         mask = polygons_to_bitmask(polygons, img.shape[0], img.shape[1])
-
         for idx, anno in enumerate(annos):
             bbox = anno['bbox']
             bbox = adjust_bbox([int(bbox[0]), int(bbox[1]), int(bbox[0]+bbox[2]), int(bbox[1]+bbox[3])], img.shape[:2], pad_scale=pad_scale)
@@ -99,46 +66,9 @@ def generate_mask_RoI(img_to_anno, image_root, output_path, suffix, pad_scale=0.
             cv2.imwrite(osp.join(output_image_path, f'{base_name}_{idx}.png'), crop_img)
             cv2.imwrite(osp.join(output_anno_path, f'{base_name}_{idx}{suffix}.png'), crop_mask)
 
-    print('task done!')
-
-def read_json(json_path): 
-    """
-    read json from given path 
-    """
-    with open(json_path, "r") as f:
-        data = json.load(f)
-    return data
-
-def group_images_annotations(data, class_id=None):
-    id_to_img = {}
-    img_to_annos = {}
-    for img in data["images"]:
-        id_to_img[img["id"]] = img['file_name']
-        img_to_annos[img['file_name']] = []
-
-    for anno in data["annotations"]:
-        if anno.get('iscrowd', 1):
-            continue
-        if class_id is not None:
-            if anno["category_id"] not in class_id:
-                continue
-        image_path = id_to_img[anno["image_id"]]
-        if image_path not in img_to_annos.keys():
-            img_to_annos[image_path] = [{"bbox": anno["bbox"], 
-                                        "segmentation": anno["segmentation"],
-                                         "category_id": anno["category_id"]}]
-        else:
-            img_to_annos[image_path].append({"bbox": anno["bbox"], 
-                                            "segmentation": anno["segmentation"], 
-                                             "category_id": anno["category_id"]})
-    return img_to_annos
-
-
-
-def get_args():
+def parse_args():
     parser = argparse.ArgumentParser(
         description='Json Format convert to RoI binary Mask ')
-
     # Parameters
     parser.add_argument(
         '--json_path',
@@ -180,7 +110,6 @@ def get_args():
     return args
 
 if __name__ == '__main__':
-    args = get_args()
-    data = read_json(args.json_path)
-    img_to_annos = group_images_annotations(data, args.seg_classid)
-    generate_mask_RoI(img_to_annos, args.image_path, args.output_path, args.suffix, args.pad_scale)
+    args = parse_args()
+    data = COCO(args.json_path)
+    generate_mask_RoI(data, args.image_path, args.output_path, args.suffix, args.seg_classid, args.pad_scale)

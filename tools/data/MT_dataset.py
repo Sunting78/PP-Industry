@@ -76,7 +76,6 @@ def convert_MT(args):
             anno_img = cv2.imread(osp.join(folder_path, anno_name), -1)
             anno_img[anno_img > 0] = label_id 
         
-            
             exp_prefix = img_name.split('_')[0]
             if exp_prefix in TRAIN_PREFIX:
                 shutil.copyfile(osp.join(folder_path, img_name), osp.join(train_img_path, img_name))

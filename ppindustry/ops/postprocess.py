@@ -65,16 +65,16 @@ class JudgeDetByScores(object):
         #mod = importlib.import_module(__name__)
 
     def __call__(self, inputs):
-
         for img_path, img_info in inputs.items():
             preds = img_info['pred']
             for pred in preds:
+                #mport pdb;pdb.set_trace()
                 if pred.get("isNG", 1):
                     if isinstance(self.score_threshold, dict):
                         if pred['category_id'] in self.score_threshold.keys():
                             threshold = self.score_threshold[pred['category_id']]
-                        else:  
-                            pred['isNG'] = 0
+                        else:
+                            pred['isNG'] = 1
                             continue
                     else: 
                         threshold = self.score_threshold
@@ -83,7 +83,6 @@ class JudgeDetByScores(object):
                         pred['isNG'] = 0
                     else:
                         pred['isNG'] = 1
-
         return inputs
 
 @register
@@ -94,7 +93,6 @@ class JudgeByLengthWidth(object):
         #mod = importlib.import_module(__name__)
 
     def __call__(self, inputs):
-
         for img_path, img_info in inputs.items():
             preds = img_info['pred']
             for pred in preds:
@@ -107,7 +105,6 @@ class JudgeByLengthWidth(object):
                             continue
                     else: 
                         threshold = self.len_thresh
-                    
                     if pred['bbox'][2] >= threshold or pred['bbox'][3] >= threshold:
                         pred['isNG'] = 1
                     else:

@@ -22,19 +22,9 @@ import paddle
 from ppindustry.cvlib.configs import ConfigParser
 from ppindustry.cvlib.framework import Builder
 from ppindustry.utils.logger import setup_logger
-from ppindustry.utils.visualizer import draw_bbox
-import pycocotools.mask as mask_util
+from ppindustry.utils.visualizer import show_result
 from ppdet.utils.colormap import colormap
 
-def polygons_to_bitmask(polygons, height, width):
-    if len(polygons) == 0 :
-        # COCOAPI does not support empty polygons
-        return np.zeros((height, width)).astype(int)
-
-    rles = mask_util.frPyObjects(polygons, height, width)
-    rle = mask_util.merge(rles)
-
-    return mask_util.decode(rle).astype(int)
 
 logger = setup_logger('pipeline')
 
@@ -138,79 +128,12 @@ class Pipeline(object):
         return results
         
 
-    def show_result(self, results):
-        catid2color = {}
-        for im_path, preds in results.items():
-            im_file = os.path.basename(im_path)
-
-            image = Image.open(im_path)
-            num = 0
-            
-            color_list = colormap(rgb=True)[:40]
-            for pred in preds['pred']:
-                draw = ImageDraw.Draw(image)
-                cate_id = pred['category_id']
-                if cate_id not in catid2color:
-                    idx = np.random.randint(len(color_list))
-                    catid2color[cate_id] = color_list[idx]
-                color = tuple(catid2color[cate_id])
-
-                if 'bbox' in pred:
-                    bbox  = pred['bbox']
-                    xmin, ymin, w, h = bbox
-                    xmax = xmin + w
-                    ymax = ymin + h
-                    draw.line(
-                        [(xmin, ymin), (xmin, ymax), (xmax, ymax), (xmax, ymin),
-                        (xmin, ymin)],
-                        width=2,
-                        fill=color)
-
-                    isNG = pred['isNG']
-                    if 'score' in pred:
-                        score = pred['score']
-                        text = "{} {:.2f} {}".format(str(cate_id), score, 'NG' if isNG else 'OK')
-                    else:
-                        text = "{} {}".format(str(cate_id), 'NG' if isNG else 'OK')
-                    
-                    tw, th = draw.textsize(text)
-                    if ymin - th >=1:
-                        draw.rectangle(
-                            [(xmin + 1, ymin - th), (xmin + tw + 1, ymin)], fill=color)
-                        draw.text((xmin + 1, ymin - th), text, fill=(255, 255, 255))
-                    else:
-                        draw.rectangle(
-                            [(xmin + 1, ymax ), (xmin + tw + 1, ymax + th)], fill=color)
-                        draw.text((xmin + 1, ymax + 1), text, fill=(255, 255, 255)) 
-
-                if 'polygon' in pred:
-                    polygons = pred['polygon']
-                    if len(polygons) == 0 or len(polygons[0]) < 4:
-                        continue
-                    alpha = 0.7
-                    w_ratio = .4
-                    img_array = np.array(image).astype('float32')
-                    color = np.asarray(color)
-                    for c in range(3):
-                        color[c] = color[c] * (1 - w_ratio) + w_ratio * 255
-                    
-                    mask = polygons_to_bitmask(polygons, img_array.shape[0], img_array.shape[1])
-
-                    idx = np.nonzero(mask)
-                    img_array[idx[0], idx[1], :] *= 1.0 - alpha
-                    img_array[idx[0], idx[1], :] += alpha * color
-                    image = Image.fromarray(img_array.astype('uint8'))
-
-            pred_saved_path = os.path.join(
-                self.output_dir, os.path.splitext(im_file)[0] + ".png")
-            image.save(pred_saved_path)
-
 
     def predict_images(self, input):
         results = self.modules.run(input)
         #results = self.update(results, input)
         if self.vis:
-            self.show_result(results)
+            show_result(results, self.output_dir)
 
         if self.save: 
             with open(os.path.join(self.output_dir, 'output.json'), "w") as f: 

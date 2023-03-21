@@ -18,55 +18,13 @@ import os.path as osp
 import cv2
 import numpy as np
 
+from ppindustry.utils.bbox_utils import adjust_bbox
+
 
 def _mkdir_p(path):
     """Make the path exists"""
     if not osp.exists(path):
         os.makedirs(path)
-    
-def square(bbox, size):
-    """Convert a `Boxes` into a square tensor."""
-    x1, y1, x2, y2 = bbox
-    w, h = x2 - x1 + 1, y2 - y1 + 1
-    if w < h:
-        pad = (h - w) // 2
-        x1 = max(0, x1 - pad)
-        x2 = min(size[1], x2 + pad)
-    else:
-        pad = (w - h) // 2
-        y1 = max(0, y1 - pad)
-        y2 = min(size[0], y2 + pad)
-    return x1, y1, x2, y2
-
-
-def pad(bbox, img_size, pad_scale=0.5):
-    """pad bbox with scale
-    Args:
-        bbox (list):[x1, y1, x2, y2]
-        img_size (tuple): (height, width)
-        pad_scale (float): scale for padding
-    Return:
-        bbox (list)
-    """
-    x1, y1, x2, y2 = bbox
-    w, h = x2 - x1 + 1, y2 - y1 + 1
-    dw = int(w * pad_scale)
-    dh = int(h * pad_scale)
-    x1 = max(0, x1 - dw)
-    x2 = min(img_size[1], x2 + dw)
-    y1 = max(0, y1 - dh)
-    y2 = min(img_size[0], y2 + dh)
-    return x1, y1, x2, y2
-
-
-def adjust_bbox(bbox, img_shape, pad_scale=0.5):
-    """
-    adjust box according to img_shape and pad_scale 
-    """
-    bbox = square(bbox, img_shape)
-    bbox = pad(bbox, img_shape, pad_scale)
-    return bbox
-
 
 def get_args():
     parser = argparse.ArgumentParser(

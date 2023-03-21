@@ -7,6 +7,10 @@ output/
 # C extensions
 *.so
 *.json
+log/
+output*/
+0MToutput_det/
+
 
 # Distribution / packaging
 .Python

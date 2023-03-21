@@ -72,7 +72,7 @@ class Predictor(Trainer):
                     outs[key] = value.numpy()
             #outs['im_path'] = imid2path[int(outs['im_id'])]
             infer_res = self.get_det_res(
-                outs['bbox'], outs['bbox_num'], outs['im_id'], clsid2catid, imid2path, score_thresh=score_thresh)
+                outs['bbox'], outs['bbox_num'], outs['im_id'], clsid2catid, catid2name, imid2path, score_thresh=score_thresh)
 
             results.extend(infer_res)
 
@@ -130,7 +130,7 @@ class Predictor(Trainer):
 
         return results
 
-    def get_det_res(self, bboxes, bbox_nums, image_id, label_to_cat_id_map, imid2path, bias=0, score_thresh=0.0):
+    def get_det_res(self, bboxes, bbox_nums, image_id, label_to_cat_id_map, catid2name, imid2path, bias=0, score_thresh=0.0):
         det_res = []
         k = 0
         for i in range(len(bbox_nums)):
@@ -153,6 +153,7 @@ class Predictor(Trainer):
                     'image_id': cur_image_id,
                     'image_path': cur_image_path,
                     'category_id': category_id,
+                    'category_name': catid2name[category_id],
                     'bbox': bbox,
                     'score': score
                 }

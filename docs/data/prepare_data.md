@@ -80,6 +80,10 @@ python3 tools/convert_tools/convert_mask_to_coco.py --image_path ./dataset/MT_da
 ```
 其中由于除去背景是5类缺陷，因此class_num是5，保存了train的coco格式检测训练文件。
 
+如果想检查coco格式的数据是否正确转换，可以使用以下命令进行可视化，其中`json_path`是上面生成的json文件，root_path是图像目录，save_path是保存可视化图像的路径
+```shell
+python3 tools/convert_tools/vis_coco.py --json_path ./dataset/MT_dataset/train.json --root_path ./ --save_path ./show/
+```
 
 
 
