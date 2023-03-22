@@ -78,7 +78,7 @@ def get_args():
     parser.add_argument(
         '--output_path',
         type=str,
-        default='./0MToutput_seg/badcase/',
+        default='./0MToutput_det/badcase/',
         help='save path to save images and mask, default None, do not save'
     )
     return parser.parse_args()
