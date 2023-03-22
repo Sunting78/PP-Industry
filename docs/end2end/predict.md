@@ -70,6 +70,7 @@ python3 tools/end2end/predict.py --config ./configs/end2end/e2e_det.yml --input 
 ## 输出结果可视化：
 
 以Magnetic-tile-defect-datasets为例：
+
 ![](../images/exp5_num_88170.png)
 ![](../images/exp5_num_5022.png)
 
