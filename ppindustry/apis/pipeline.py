@@ -44,7 +44,6 @@ class Pipeline(object):
     def _parse_input(self, input):
         im_exts = ['jpg', 'jpeg', 'png', 'bmp']
         im_exts += [ext.upper() for ext in im_exts]
-        json_exts = ['json']
 
         if isinstance(input, (list, tuple)) and isinstance(input[0], str):
             input_type = "image"
@@ -73,10 +72,6 @@ class Pipeline(object):
         input_ext = os.path.splitext(input)[-1][1:]
         if input_ext in im_exts:
             input_type = "image"
-            return [input], input_type
-
-        if input_ext in json_exts:
-            input_type = "json"
             return [input], input_type
         
         raise ValueError("Unsupported input format: {}".fomat(input_ext))

@@ -26,9 +26,7 @@
    * [准备全流程配置文件](./end2end/parse_config.md)
    * [全流程预测](./end2end/predict.md)
 
-### 全流程指标评测（过杀/漏检）
-    * 全流程指标评估
-    * 全流程后处理参数调优
-    * badcase可视化分析
-
-[def]: ./docs/model_export_onnx_cn.md
+### 全流程评估（过杀/漏检）
+   * [指标评估](./end2end/predict.md)
+   * [badcase可视化分析]
+   * [后处理参数调优]

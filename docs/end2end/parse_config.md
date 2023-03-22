@@ -1,14 +1,16 @@
-# 准备端到端预测配置文件 
+# 准备全流程预测配置文件 
 
-全流程配置文件按照模块化进行定义，包含环境，全流程，检测，分割，RoI分割以及后处理等模块信息
+全流程配置文件按照模块化进行定义，包含环境，全流程，检测，分割，RoI分割以及后处理等模块信息。
 
-全流程配置文件保存在`./configs/end2end/`目录下, 提供了三种常用的工业质检PPL，分别是：
+配置文件保存在`./configs/end2end/`目录下, 提供了三种常用的工业质检PPL，分别是：
 
 * [检测+后处理](../../configs/end2end/e2e_det.yml)
 * [分割+后处理](../../configs/end2end/e2e_seg.yml)
 * [检测+RoI分割+后处理](../../configs/end2end/e2e_det_RoI_seg.yml)
 
 ## 详细解读
+
+基于检测+RoI分割+后处理的配置文件`./configs/end2end/e2e_det_RoI_seg.yml`进行详细的参数解读：
 
 ```
 ENV:
