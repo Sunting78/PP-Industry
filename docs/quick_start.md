@@ -19,7 +19,7 @@
 
 ### 3. 训练/推理
    * [无监督异常检测算法](./uad/README.md)
-   * [检测分割算法]
+   * [检测分割算法](./det_seg/train_eval.md)
     
 ### 全流程预测
    * [准备全流程配置文件](./end2end/parse_config.md)
