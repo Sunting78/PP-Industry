@@ -10,22 +10,21 @@
    * 支持质检后处理，全流程评测过杀漏失，并进行badcase可视化等；
 
 ## 快速开始
-### 1. 环境依赖
-
+### 1. [安装说明](./docs/install.md)
 ### 2. 数据准备
-   * [准备数据集](./data/prepare_data.md)
-   * [数据集格式转换工具](./data/conver_tools.md)
+   * [准备数据集](./docs/data/prepare_data.md)
+   * [数据集格式转换工具](./docs/data/conver_tools.md)
    * [EISeg 数据标注](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.7/EISeg)
 
 ### 3. 训练/推理
-   * [无监督异常检测算法](./uad/README.md)
-   * [检测分割算法](./det_seg/train_eval.md)
+   * [无监督异常检测算法](./docs/uad/README.md)
+   * [检测分割算法](./docs/det_seg/train_eval.md)
     
 ### 全流程预测
-   * [准备全流程配置文件](./end2end/parse_config.md)
-   * [全流程预测](./end2end/predict.md)
+   * [准备全流程配置文件](./docs/end2end/parse_config.md)
+   * [全流程预测](./docs/end2end/predict.md)
 
 ### 全流程评估（过杀/漏检）
-   * [指标评估](./end2end/eval.md)
-   * [badcase可视化分析](./end2end/eval.md)
-   * [后处理参数调优](./end2end/eval.md)
+   * [指标评估](./docs/end2end/eval.md)
+   * [badcase可视化分析](./docs/end2end/eval.md)
+   * [后处理参数调优](./docs/end2end/eval.md)
