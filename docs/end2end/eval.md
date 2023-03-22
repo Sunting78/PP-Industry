@@ -17,9 +17,9 @@ python3 tools/end2end/eval.py --input_path ./dataset/MT_dataset/val.json --pred_
 | `--input`      |  待预测的图像路径 或单个图像文件         |           |
 | `--output_dir` |  保存预测文件和可视化结果路径            |`./output/`|
 
-## 指标说明
-
-[03/22 16:33:03] Eval INFO: OK Evaluation Result:
+## 输出结果和指标说明
+```
+Eval INFO: OK Evaluation Result:
 +----------+-------+-------+-------+-------+-------+-------+
 |    OK    |  ALL  |   1   |   2   |   3   |   4   |   5   |
 +----------+-------+-------+-------+-------+-------+-------+
@@ -28,6 +28,7 @@ python3 tools/end2end/eval.py --input_path ./dataset/MT_dataset/val.json --pred_
 |    NG    |   23  |   13  |   7   |   2   |   0   |   4   |
 | Overkill | 7.23% | 4.09% | 2.20% | 0.63% | 0.00% | 1.26% |
 +----------+-------+-------+-------+-------+-------+-------+
+```
 ## badcase可视化
 
 ## 后处理参数调整
