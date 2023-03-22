@@ -27,7 +27,7 @@ python3 tools/end2end/eval.py --input_path ./dataset/MT_dataset/val.json --pred_
 
 ## 输出结果和指标说明
 
-**输出过杀指标**
+**过杀指标**
 ```
 Eval INFO: OK Evaluation Result:
 +----------+--------+----------+-------+-------+-------+--------+
@@ -40,8 +40,9 @@ Eval INFO: OK Evaluation Result:
 +----------+--------+----------+-------+-------+-------+--------+
 ```
 
+其中，Total是OK图像总数，即OK与NG行的纵向和，`Overkill=NG/Total`，每一个类别下的NG数是指包含该类别的NG预测box或者mask的图像数量。
 
-**输出图像级别漏检指标**
+**图像级别漏检指标**
 ```
 Eval INFO: Result of Image-Level NG NG Evaluation:
 +--------------+-------+-----+----+--------+
@@ -51,7 +52,9 @@ Eval INFO: Result of Image-Level NG NG Evaluation:
 +--------------+-------+-----+----+--------+
 ```
 
-**输出实例级别漏检指标**
+其中，Total是NG图像总数, NG表示该图像存在任意一个预测为NG的box/mask（不关注这个NG预测是否是正确的位置或类别，可称作Luckcy Recall），OK表示图像没有任何的NG预测box/mask。`Escape=OK/Total` 
+
+**实例级别漏检指标**
 ```
 Eval INFO: Result of Instance-Level NG Evaluation:
 +----------+--------+----------+--------+--------+-------+--------+
