@@ -1,4 +1,3 @@
-
 def post_process_image_info(result):
     for img_path, img_info in result.items():
         preds = img_info['pred']

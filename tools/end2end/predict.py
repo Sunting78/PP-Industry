@@ -19,16 +19,12 @@ import sys
 parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 3)))
 sys.path.insert(0, parent_path)
 
-import numpy as np
-
-import cv2
-import paddle
 from ppindustry.apis.pipeline import Pipeline
 from ppindustry.cvlib.configs import ArgsParser
 
+
 def argsparser():
     parser = ArgsParser()
-
     parser.add_argument(
         "--config",
         type=str, 

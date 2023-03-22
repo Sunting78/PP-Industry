@@ -11,11 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  
 # See the License for the specific language governing permissions and   
 # limitations under the License.
-import os
-import math
-import numpy as np
 
-import cv2
+import os
+import os.path as osp
+
+import numpy as np
 from PIL import Image, ImageDraw
 import pycocotools.mask as mask_util
 from ppdet.utils.colormap import colormap
@@ -28,11 +28,36 @@ def polygons_to_bitmask(polygons, height, width):
 
     rles = mask_util.frPyObjects(polygons, height, width)
     rle = mask_util.merge(rles)
-
     return mask_util.decode(rle).astype(int)
 
-    
+
+def draw_one_bboxes(path, annos, clsid_to_name, output_dir=None):
+    if len(annos) == 0:
+        return
+    image = Image.open(path).convert('RGB') 
+    draw = ImageDraw.Draw(image)
+    for anno in annos:
+        x, y, w, h = anno["bbox"]
+        draw.line([
+            (x, y), (x, int(y + h)), 
+            (int(x + w), int(y + h)), 
+            (int(x + w), y), (x, y)
+            ],
+            width=2,
+            fill=(255, 0, 0))
+        text = "class: {}".format(str(clsid_to_name[anno["category_id"]]['name']))
+        _, th = draw.textsize(text)
+        draw.text((x, y - th), text)
+    if output_dir and not osp.exists(output_dir):
+        os.makedirs(output_dir)
+    image.save(osp.join(output_dir, osp.basename(path)))
+
+
+
 def show_result(results, output_dir=None):
+    if output_dir and not osp.exists(output_dir):
+        os.makedirs(output_dir)
+
     catid2color = {}
     for im_path, preds in results.items():
         image = Image.open(im_path).convert("RGB")
@@ -92,7 +117,7 @@ def show_result(results, output_dir=None):
                 img_array[idx[0], idx[1], :] *= 1.0 - alpha
                 img_array[idx[0], idx[1], :] += alpha * color
                 image = Image.fromarray(img_array.astype('uint8'))
-                
+
         im_file = os.path.basename(im_path)
         pred_saved_path = os.path.join(
             output_dir, os.path.splitext(im_file)[0] + ".png")

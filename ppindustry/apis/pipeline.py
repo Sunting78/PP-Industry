@@ -13,20 +13,19 @@
 # limitations under the License.
 
 import glob
-import os
 import json
+import os
+
 import numpy as np
-from PIL import Image, ImageDraw
 import paddle
 
 from ppindustry.cvlib.configs import ConfigParser
 from ppindustry.cvlib.framework import Builder
 from ppindustry.utils.logger import setup_logger
 from ppindustry.utils.visualizer import show_result
-from ppdet.utils.colormap import colormap
-
 
 logger = setup_logger('pipeline')
+
 
 class Pipeline(object):
     def __init__(self, cfg):
@@ -81,9 +80,8 @@ class Pipeline(object):
             return [input], input_type
         
         raise ValueError("Unsupported input format: {}".fomat(input_ext))
-        return
-
-    def partition_list(aself, arr, m):
+    
+    def partition_list(self, arr, m):
         """split the list 'arr' into m pieces"""
         image_list = []
         for idx in range(m):
@@ -96,29 +94,6 @@ class Pipeline(object):
             image_list.append(arr[start:end])
         return image_list
 
-    def run_ranks(self, input):
-        image_list, input_type = self._parse_input(input)
-        
-        nranks = paddle.distributed.get_world_size()
-        local_rank = paddle.distributed.get_rank()
-        if nranks > 1:
-            img_lists = self.partition_list(image_list, nranks)
-        else:
-            img_lists = [image_list]
-        results = []
-
-        for i, im_data in enumerate(img_lists[local_rank]):
-            output = self.predict_images(im_data)
-            results.append(output)
-            logger.info(
-                'processed the images automatically')
-        all_results = []
-        if local_rank == 0:
-            paddle.distributed.all_gather_object(all_results, results)
-        
-
-        return results
-
     def run(self, input):
         input, input_type = self._parse_input(input)
         if input_type == "image" :
@@ -127,17 +102,12 @@ class Pipeline(object):
             raise ValueError("Unexpected input type: {}".format(input_type))
         return results
         
-
-
     def predict_images(self, input):
         results = self.modules.run(input)
-        #results = self.update(results, input)
         if self.vis:
             show_result(results, self.output_dir)
-
         if self.save: 
             with open(os.path.join(self.output_dir, 'output.json'), "w") as f: 
                 json.dump(results, f, indent=2) 
-
         return results
 

@@ -58,6 +58,12 @@ class SegPredictor(object):
             if cls_id == 0:
                 continue # skip background
             class_map = np.equal(pred, cls_id).astype(np.uint8)
+            y_indices, x_indices = np.nonzero(class_map)
+            y_min = int(y_indices.min())
+            y_max = int(y_indices.max())
+            x_min = int(x_indices.min())
+            x_max = int(x_indices.max())
+            
             contours, _ = cv2.findContours(class_map, cv2.RETR_LIST,
                                         cv2.CHAIN_APPROX_SIMPLE)
             polygon = []
@@ -65,10 +71,12 @@ class SegPredictor(object):
                 if len(contours[j]) <= 4:
                     continue
                 polygon.append(contours[j].flatten().tolist())
-            
+
+
             result.append({
                 'image_path': img_data,
                 'category_id': int(cls_id),
+                'bbox': [x_min, y_min, x_max - x_min, y_max - y_min],
                 #'mask': class_map,
                 'polygon': polygon,
                 'area': int(np.sum(class_map > 0)),

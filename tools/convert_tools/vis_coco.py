@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import argparse
 import os
 import os.path as osp
@@ -27,6 +28,7 @@ def parse_args():
     parser.add_argument('--root_path', type=str, default="", help="root path of images")
     parser.add_argument('--save_path', type=str, default="./show/", help="where to save visualization result")
     return parser.parse_args()
+
 
 def visualization_bbox(args):
     coco = COCO(args.json_path)
@@ -54,6 +56,7 @@ def visualization_bbox(args):
             _, th = draw.textsize(text)
             draw.text((x, y - th), text)
         image.save(osp.join(args.save_path, osp.basename(im_info['file_name'])))
+
 
 if __name__ == "__main__":
     args = parse_args()

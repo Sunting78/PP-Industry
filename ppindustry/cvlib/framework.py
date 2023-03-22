@@ -45,7 +45,6 @@ class Builder(object):
             op = create(op_arch, op_cfg, env_cfg)
             self.op_name2op[op_arch] = op
 
-
     def update(self, results, input):
         """"update model results"""
         image_to_info = {}
@@ -60,16 +59,7 @@ class Builder(object):
             
             else:
                 image_to_info[image_path]['pred'].append(pred)
-            
-            #if 'isNG' not in image_to_info[image_path].keys() or image_to_info[image_path]['isNG'] == 0:
-            #    image_to_info[image_path]['isNG'] = pred['isNG']
-
-            #if not image_to_info[image_path].get('isNG', 0):
-            #    image_to_info[image_path]['isNG'] = pred['isNG']
-
         return image_to_info
-
-
 
     def run(self, input, frame_id=-1):
         image_list = input
@@ -81,7 +71,5 @@ class Builder(object):
             input = result
         
         post_process_image_info(result)
-
-            
         print(result)
         return result

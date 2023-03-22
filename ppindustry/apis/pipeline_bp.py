@@ -124,6 +124,29 @@ class Pipeline(object):
             paddle.distributed.all_gather_object(all_results, results)
         return results
 
+    def run_ranks(self, input):
+        image_list, input_type = self._parse_input(input)
+        
+        nranks = paddle.distributed.get_world_size()
+        local_rank = paddle.distributed.get_rank()
+        if nranks > 1:
+            img_lists = self.partition_list(image_list, nranks)
+        else:
+            img_lists = [image_list]
+        results = []
+
+        for i, im_data in enumerate(img_lists[local_rank]):
+            output = self.predict_images(im_data)
+            results.append(output)
+            logger.info(
+                'processed the images automatically')
+        all_results = []
+        if local_rank == 0:
+            paddle.distributed.all_gather_object(all_results, results)
+        
+
+        return results
+
     def update(self, results):
         """"update model results"""
         outputs = []

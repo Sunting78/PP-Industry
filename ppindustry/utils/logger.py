@@ -18,8 +18,6 @@ import sys
 
 import paddle.distributed as dist
 
-__all__ = ['setup_logger']
-
 logger_initialized = []
 
 

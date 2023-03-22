@@ -60,8 +60,7 @@ def get_args():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
-    args = get_args()
+def convert_mask_to_coco(args):
     image_path = args.image_path
     anno_path = args.anno_path
     output_name = args.output_name
@@ -121,3 +120,9 @@ if __name__ == '__main__':
     json_data = {'images': images, 'annotations': annotations, 'categories': categories}
     with open(output_name, "w") as f:
         json.dump(json_data, f, indent=2)
+
+
+if __name__ == '__main__':
+    args = get_args()
+    convert_mask_to_coco(args)
+

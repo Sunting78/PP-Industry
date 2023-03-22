@@ -11,9 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import argparse
 import os
 import os.path as osp
+import sys
+parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 3)))
+sys.path.insert(0, parent_path)
 
 import cv2
 import numpy as np
@@ -21,15 +25,9 @@ import numpy as np
 from ppindustry.utils.bbox_utils import adjust_bbox
 
 
-def _mkdir_p(path):
-    """Make the path exists"""
-    if not osp.exists(path):
-        os.makedirs(path)
-
 def get_args():
     parser = argparse.ArgumentParser(
         description='Mask Format convert to Json for detection ')
-
     # Parameters
     parser.add_argument(
         '--image_path',
@@ -74,8 +72,13 @@ def get_args():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
-    args = get_args()
+def _mkdir_p(path):
+    """Make the path exists"""
+    if not osp.exists(path):
+        os.makedirs(path)
+
+
+def convert_mask_to_roi(args):
     image_path = args.image_path
     anno_path = args.anno_path
     suffix = args.suffix
@@ -124,3 +127,9 @@ if __name__ == '__main__':
                 line = img_save_path + " " + anno_save_path + '\n'
                 f.write(line)
     f.close()
+
+
+if __name__ == '__main__':
+    args = get_args()
+    convert_mask_to_roi(args)
+

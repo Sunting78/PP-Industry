@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import argparse
 import os
 import os.path as osp
@@ -25,46 +26,6 @@ import pycocotools.mask as mask_util
 
 from ppindustry.utils.bbox_utils import adjust_bbox
 
-
-def _mkdir_p(path):
-    """Make the path exists"""
-    if not osp.exists(path):
-        os.makedirs(path)
-
-def polygons_to_bitmask(polygons, height, width):
-    if len(polygons) == 0:
-        # COCOAPI does not support empty polygons
-        return np.zeros((height, width)).astype(int)
-    rles = mask_util.frPyObjects(polygons, height, width)
-    rle = mask_util.merge(rles)
-    return mask_util.decode(rle).astype(int)
-
-def generate_mask_RoI(data, image_root, output_path, suffix, class_id=None, pad_scale=0.5):
-    output_image_path = osp.join(output_path, 'images')
-    _mkdir_p(output_image_path)
-    output_anno_path = osp.join(output_path, 'anno')
-    _mkdir_p(output_anno_path)
-
-    img_ids = list(sorted(data.imgs.keys()))
-    for img_id in img_ids:
-        im_info = data.loadImgs(img_id)[0]
-        ann_ids = data.getAnnIds(imgIds=img_id, catIds=class_id, iscrowd=False)
-        annos = data.loadAnns(ann_ids)
-        if len(annos) == 0:
-            continue
-        img = cv2.imread(osp.join(image_root, im_info['file_name']))
-        base_name = os.path.basename(im_info['file_name']).split('.')[0]
-        polygons = []
-        for anno in annos:
-            polygons.extend(anno['segmentation'])
-        mask = polygons_to_bitmask(polygons, img.shape[0], img.shape[1])
-        for idx, anno in enumerate(annos):
-            bbox = anno['bbox']
-            bbox = adjust_bbox([int(bbox[0]), int(bbox[1]), int(bbox[0]+bbox[2]), int(bbox[1]+bbox[3])], img.shape[:2], pad_scale=pad_scale)
-            crop_img = img[bbox[1]:bbox[3], bbox[0]:bbox[2], :]
-            crop_mask = mask[bbox[1]:bbox[3], bbox[0]:bbox[2]]
-            cv2.imwrite(osp.join(output_image_path, f'{base_name}_{idx}.png'), crop_img)
-            cv2.imwrite(osp.join(output_anno_path, f'{base_name}_{idx}{suffix}.png'), crop_mask)
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -105,9 +66,51 @@ def parse_args():
         default='./output/',
         help='save path to save images and mask, default None, do not save'
     )
-    args = parser.parse_args()
+    return parser.parse_args()
 
-    return args
+
+def _mkdir_p(path):
+    """Make the path exists"""
+    if not osp.exists(path):
+        os.makedirs(path)
+
+
+def polygons_to_bitmask(polygons, height, width):
+    if len(polygons) == 0:
+        # COCOAPI does not support empty polygons
+        return np.zeros((height, width)).astype(int)
+    rles = mask_util.frPyObjects(polygons, height, width)
+    rle = mask_util.merge(rles)
+    return mask_util.decode(rle).astype(int)
+
+
+def generate_mask_RoI(data, image_root, output_path, suffix, class_id=None, pad_scale=0.5):
+    output_image_path = osp.join(output_path, 'images')
+    _mkdir_p(output_image_path)
+    output_anno_path = osp.join(output_path, 'anno')
+    _mkdir_p(output_anno_path)
+
+    img_ids = list(sorted(data.imgs.keys()))
+    for img_id in img_ids:
+        im_info = data.loadImgs(img_id)[0]
+        ann_ids = data.getAnnIds(imgIds=img_id, catIds=class_id, iscrowd=False)
+        annos = data.loadAnns(ann_ids)
+        if len(annos) == 0:
+            continue
+        img = cv2.imread(osp.join(image_root, im_info['file_name']))
+        base_name = os.path.basename(im_info['file_name']).split('.')[0]
+        polygons = []
+        for anno in annos:
+            polygons.extend(anno['segmentation'])
+        mask = polygons_to_bitmask(polygons, img.shape[0], img.shape[1])
+        for idx, anno in enumerate(annos):
+            bbox = anno['bbox']
+            bbox = adjust_bbox([int(bbox[0]), int(bbox[1]), int(bbox[0]+bbox[2]), int(bbox[1]+bbox[3])], img.shape[:2], pad_scale=pad_scale)
+            crop_img = img[bbox[1]:bbox[3], bbox[0]:bbox[2], :]
+            crop_mask = mask[bbox[1]:bbox[3], bbox[0]:bbox[2]]
+            cv2.imwrite(osp.join(output_image_path, f'{base_name}_{idx}.png'), crop_img)
+            cv2.imwrite(osp.join(output_anno_path, f'{base_name}_{idx}{suffix}.png'), crop_mask)
+
 
 if __name__ == '__main__':
     args = parse_args()

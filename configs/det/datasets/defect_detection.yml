@@ -12,7 +12,7 @@ EvalDataset:
   name: COCODataSet
   anno_path: ./dataset/MT_dataset/val.json
   dataset_dir: ./
-  allow_empty: false
+  allow_empty: true
 
 TestDataset:
   name: ImageFolder

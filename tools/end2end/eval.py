@@ -1,30 +1,42 @@
+# Copyright (c) 2023 PaddlePaddle Authors. All Rights Reserved. 
+#   
+# Licensed under the Apache License, Version 2.0 (the "License");   
+# you may not use this file except in compliance with the License.  
+# You may obtain a copy of the License at   
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0    
+#   
+# Unless required by applicable law or agreed to in writing, software   
+# distributed under the License is distributed on an "AS IS" BASIS, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  
+# See the License for the specific language governing permissions and   
+# limitations under the License.
+
 import argparse
 import json
 import os
 import os.path as osp
 from collections import defaultdict
 
-import cv2
-import numpy as np
 import sys
 parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 3)))
 sys.path.insert(0, parent_path)
 
 import prettytable as pt
 from pycocotools.coco import COCO
+from PIL import Image, ImageDraw
 
 from ppindustry.cvlib.configs import ConfigParser
 from ppindustry.ops.postprocess import PostProcess
 from ppindustry.utils.logger import setup_logger
 from ppindustry.utils.data_dict import post_process_image_info
 from ppindustry.utils.bbox_utils import iou_one_to_multiple 
-
+from ppindustry.utils.visualizer import show_result, draw_one_bboxes
 logger = setup_logger('Eval')
 
-def get_args():
-    parser = argparse.ArgumentParser(
-        description='Json Format convert to RoI binary Mask ')
 
+def get_args():
+    parser = argparse.ArgumentParser(description='Eval')
     # Parameters
     parser.add_argument(
         '--input_path',
@@ -66,12 +78,11 @@ def get_args():
     parser.add_argument(
         '--output_path',
         type=str,
-        default='./output/',
+        default='./0MToutput_seg/badcase/',
         help='save path to save images and mask, default None, do not save'
     )
-    args = parser.parse_args()
+    return parser.parse_args()
 
-    return args
 
 def read_json(json_path): 
     """
@@ -81,18 +92,18 @@ def read_json(json_path):
         data = json.load(f)
     return data
 
+
 def set_class_to_set(data_dict):
     for cls in data_dict.keys():
         data_dict[cls] = set(data_dict[cls])
     return data_dict
 
+
 def eval_ng(gt_data, gt_ng_ids, preds_data, image_root='', instance_level=True, iou_theshold=0.1):
-    ok_image_in_ng_num = 0
-    class_list = GT_data.getCatIds()
-    clsid_to_name =  GT_data.cats
+    ok_image_in_ng_num, ok_instance_in_ng_num, ng_instance_num = 0, 0, 0 
+    class_list = gt_data.getCatIds()
+    clsid_to_name =  gt_data.cats
     class_name = [clsid_to_name[i]['name'] for i in class_list]
-    ok_instance_in_ng_num = 0
-    ng_instance_num = 0
     ng_class_num = defaultdict(int)
     ok_in_ng_class_num = defaultdict(int)
     escape_info_image = []
@@ -136,8 +147,7 @@ def eval_ng(gt_data, gt_ng_ids, preds_data, image_root='', instance_level=True, 
         "Lucky Result",
         ng_num, ng_num - ok_image_in_ng_num, ok_image_in_ng_num, "{:.2f}%".format(ok_image_in_ng_num/ng_num* 100) if ng_num > 0 else 0,
     ])
-    logger.info("Result of Image-Level NG Evaluation")
-    print(table)
+    logger.info("Result of Image-Level NG NG Evaluation:\n" + str(table))
 
     if instance_level:        
         ng_class_num = [ng_class_num[cat] for cat in class_list]
@@ -164,16 +174,16 @@ def eval_ng(gt_data, gt_ng_ids, preds_data, image_root='', instance_level=True, 
             "{:.2f}%".format(ok_instance_in_ng_num/ng_instance_num* 100) if ng_instance_num> 0 else 0,
             *["{:.2f}%".format(ok_in_ng_class_num[i]/ng_class_num[i]* 100) for i in range(len(ng_class_num))]
         ])
-        logger.info("Result of Instance-Level NG Evaluation")
-        print(table)
+        logger.info("Result of Instance-Level NG Evaluation:\n" + str(table))
 
     return escape_info_image, escape_info_image_instance
+
 
 def eval_ok(gt_data, gt_ok_ids, preds_data, image_root=''):
     ng_in_ok_num = 0
     ng_info = defaultdict(list)
-    class_list = GT_data.getCatIds()
-    clsid_to_name =  GT_data.cats
+    class_list = gt_data.getCatIds()
+    clsid_to_name =  gt_data.cats
     class_name = [clsid_to_name[i]['name'] for i in class_list]
 
     for ok_id in gt_ok_ids:
@@ -205,8 +215,7 @@ def eval_ok(gt_data, gt_ok_ids, preds_data, image_root=''):
         "Overkill", "{:.2f}%".format((ng_in_ok_num / ok_num) * 100),
         *["{:.2f}%".format(x / ok_num * 100) for x in ng_class_nums]
     ])
-    logger.info("Result of OK Evaluation")
-    print(table)
+    logger.info("OK Evaluation Result:\n" + str(table))
 
     return ng_info
 
@@ -240,17 +249,53 @@ def evaluation(gt_data, preds_data, post_modules=None, image_root='', instance_l
     
     return overkill_info, escape_info_image, escape_info_image_instance
 
-def show_badcase(overkill_info, escape_info_image, escape_info_image_instance, output_dir):
+
+def show_badcase(gt_data, preds_data, overkill_info, escape_info_image, escape_info_image_instance, image_root='', output_dir=''):
     overkill_path = osp.join(output_dir, 'overkill')
-    escape_path = osp.join(output_dir, 'escape')
+    escape_image_path = osp.join(output_dir, 'escape', 'image_level')
+    escape_instance_path = osp.join(output_dir, 'escape', 'instance_level')
+
+    clsid_to_name =  gt_data.cats
+    for class_id, img_ids in overkill_info.items():
+        class_name = clsid_to_name[class_id]['name']
+        for img_id in  img_ids:
+            im_name = gt_data.loadImgs(img_id)[0]['file_name']
+            im_path = osp.join(image_root, im_name[2:])
+            preds_info = preds_data[im_path]
+            show_result({im_path: preds_info}, osp.join(overkill_path, class_name))
+
+    for img_id in escape_info_image:
+        im_name = gt_data.loadImgs(img_id)[0]['file_name']
+        ann_ids = gt_data.getAnnIds(imgIds=img_id, iscrowd=None)
+        annos = gt_data.loadAnns(ann_ids)
+        im_path = osp.join(image_root, im_name[2:])
+        draw_one_bboxes(im_path, annos, clsid_to_name, escape_image_path)
+
     import pdb;pdb.set_trace()
+    for class_id, img_anno_ids in escape_info_image_instance.items():
+        class_name = clsid_to_name[class_id]['name']
+        img_to_anno_id = defaultdict(list)
+        for img_anno_id in img_anno_ids:
+            img_id = img_anno_id[0]
+            anno_id = img_anno_id[1]
+            img_to_anno_id[img_id].append(anno_id)
+        
+        for img_id, anno_list in  img_to_anno_id.items():
+            im_name = gt_data.loadImgs(img_id)[0]['file_name']
+            #ann_ids = gt_data.getAnnIds(imgIds=img_id, iscrowd=None)
+            annos = gt_data.loadAnns(anno_list)
+            im_path = osp.join(image_root, im_name[2:])
+            draw_one_bboxes(im_path, annos, clsid_to_name, osp.join(escape_instance_path, class_name))
+
+        
+    
 
 
 
 
 if __name__ == '__main__':
     args = get_args()
-    GT_data = COCO(args.input_path)
+    gt_data = COCO(args.input_path)
     img_to_pred_annos = read_json(args.pred_path)
     post_modules = None
     if args.rules_eval:
@@ -258,12 +303,12 @@ if __name__ == '__main__':
         postprocess = config.parse()[0][-1]
         post_modules = PostProcess(postprocess['PostProcess'])
     
-    overkill_info, escape_info_image, escape_info_image_instance = evaluation(GT_data, img_to_pred_annos, post_modules, 
+    overkill_info, escape_info_image, escape_info_image_instance = evaluation(gt_data, img_to_pred_annos, post_modules, 
                                                                         args.image_root, args.instance_level, args.iou_theshold)
     if args.badcase:
-        show_badcase(GT_data, img_to_pred_annos, overkill_info, 
+        show_badcase(gt_data, img_to_pred_annos, overkill_info, 
                      escape_info_image, escape_info_image_instance,
-                     args.output_path)
+                     args.image_root, args.output_path)
 
 
 

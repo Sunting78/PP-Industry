@@ -14,8 +14,6 @@
 
 import collections
 import copy
-import math
-import os
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
@@ -23,7 +21,6 @@ from collections.abc import Mapping, Sequence
 import numpy as np
 import yaml
 
-import paddle
 import ppindustry
 from ppindustry.ops import *
 from ppindustry.utils.logger import setup_logger

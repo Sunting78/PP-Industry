@@ -69,7 +69,7 @@ python3 tools/data/MT_dataset.py --dataset_path ./dataset/Magnetic-Tile-Defect -
 在2.2中，转换为标准分割数据格式后，如果需要尝试区域分割，具体可以参考[数据转换工具](./conver_tools.md)中3.1的说明，运行命令如下：
 
 ```shell
-python3 tools/convert_tools/convert_mask_to_roi.py --image_path ./dataset/MT_dataset/images/train --anno_path ./dataset/MT_dataset/annos/train --class_num 5 --output_path ./dataset/MT_dataset/RoI/ --to_binary --suffix .png
+python3 tools/convert_tools/convert_mask_to_roi.py --image_path ./dataset/MT_dataset/images/train --anno_path ./dataset/MT_dataset/annos/train --class_num 5 --output_path ./dataset/MT_dataset/RoI/ --suffix .png --to_binary 
 ```
 其中由于除去背景是5类缺陷，因此class_num是5。
 
@@ -80,7 +80,7 @@ python3 tools/convert_tools/convert_mask_to_coco.py --image_path ./dataset/MT_da
 ```
 其中由于除去背景是5类缺陷，因此class_num是5，保存了train的coco格式检测训练文件。
 
-如果想检查coco格式的数据是否正确转换，可以使用以下命令进行可视化，其中`json_path`是上面生成的json文件，root_path是图像目录，save_path是保存可视化图像的路径
+如果想检查coco格式的数据是否正确转换，可以使用以下命令进行简单可视化，其中`json_path`是上面生成的json文件，root_path是图像目录，save_path是保存可视化图像的路径
 ```shell
 python3 tools/convert_tools/vis_coco.py --json_path ./dataset/MT_dataset/train.json --root_path ./ --save_path ./show/
 ```

@@ -10,7 +10,7 @@ output/
 log/
 output*/
 0MToutput_det/
-
+0MToutput_seg/
 
 # Distribution / packaging
 .Python
