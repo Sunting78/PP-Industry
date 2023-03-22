@@ -16,15 +16,14 @@ import argparse
 import json
 import os
 import os.path as osp
+import sys
 from collections import defaultdict
 
-import sys
 parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 3)))
 sys.path.insert(0, parent_path)
 
 import prettytable as pt
 from pycocotools.coco import COCO
-from PIL import Image, ImageDraw
 
 from ppindustry.cvlib.configs import ConfigParser
 from ppindustry.ops.postprocess import PostProcess

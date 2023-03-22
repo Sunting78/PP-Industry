@@ -1,15 +1,11 @@
-paddledet
-paddleseg
-opencv-python
+paddlepaddle-gpu>=2.2.0
+paddledet>=2.6
+paddleseg>=2.6
+visualdl>=2.2.0
+opencv-python <= 4.6.0
+pycocotools
 scikit-image
 numpy
-paddlepaddle-gpu>=2.2.0
-SimpleITK>=2.1.1
 PyYAML
-pynrrd
 tqdm
-visualdl
 sklearn
-filelock
-nibabel
-pydicom
