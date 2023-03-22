@@ -15,19 +15,19 @@ python3 tools/end2end/eval.py --input_path ./dataset/MT_dataset/val.json --pred_
 | ------------------ | ------------------------------------| --------- |
 | `--input_path`     |  带有GT框的coco格式json文件            |           |
 | `--pred_path`      |  通过全流程预测得到的预测json文件        |           |
-| `--config`         |  全流程预测配置文件                     |    None   |
-| `--image_root`     |  图像保存的根目录                      |     ` `   |
+| `--config`         |  全流程预测配置文件                     |          |
+| `--image_root`     |  图像保存的根目录                      |           |
 | `--rules_eval`     |  是否重新进行后处理判断                 |    False  |
 | `--instance_level` |  是否评测实力级别漏检指标                |    True  |
 | `--iou_theshold`   |  预测与gt框大于该阈值，视作召回          |     0.1   |
 | `--badcase`        |  是否进行badcase可视化                 |    True    |
-| `--output_path`    |  是否评测实力级别漏检指标                |`./output/` |
+| `--output_path`    |  badcase保存路径                      |`./output/` |
 
 
 
 ## 输出结果和指标说明
 
-过杀指标：
+输出过杀指标：
 ```
 Eval INFO: OK Evaluation Result:
 +----------+--------+----------+-------+-------+-------+--------+
@@ -40,7 +40,7 @@ Eval INFO: OK Evaluation Result:
 +----------+--------+----------+-------+-------+-------+--------+
 ```
 
-图像级别漏检指标结果：
+输出图像级别漏检指标结果：
 ```
 Eval INFO: Result of Image-Level NG NG Evaluation:
 +--------------+-------+-----+----+--------+
@@ -50,7 +50,7 @@ Eval INFO: Result of Image-Level NG NG Evaluation:
 +--------------+-------+-----+----+--------+
 ```
 
-实例级别漏检指标结果：
+输出实例级别漏检指标结果：
 ```
 Eval INFO: Result of Instance-Level NG Evaluation:
 +----------+--------+----------+--------+--------+-------+--------+
@@ -99,9 +99,26 @@ badcase输出保存在`output`路径下，目录结构如下：
 
 ## 后处理参数调整
 
+在经过指标输出和badcase可视化的图像查阅后，可以在配置文件中`./configs/end2end/e2e_det.yml`调整后处理的参数，注意此时的执行命令中一定要添加`--config ./configs/end2end/e2e_det.yml`和`--rules_eval`, 才能重新通过调整参数后的后处理模块。例如：在上面展示的指标中，发现Uneven类别的过杀指标较高，因此调整配置文件中后处理模块`JudgeDetByScores`中的`score_threshold`，将第5类Uneven的阈值调高，再重新执行上述评测命令，得到过杀结果如下：
+
+```
+[03/22 17:17:45] Eval INFO: OK Evaluation Result:
++----------+-------+----------+-------+-------+-------+--------+
+|    OK    |  ALL  | Blowhole | Break | Crack |  Fray | Uneven |
++----------+-------+----------+-------+-------+-------+--------+
+|  Total   |  318  |   318    |  318  |  318  |  318  |  318   |
+|    OK    |  298  |   316    |  306  |  318  |  318  |  312   |
+|    NG    |   20  |    2     |   12  |   0   |   0   |   6    |
+| Overkill | 6.29% |  0.63%   | 3.77% | 0.00% | 0.00% | 1.89%  |
++----------+-------+----------+-------+-------+-------+--------+
+```
+
+可见，Uneven类别的过杀明显降低。当然，此时可能存在一定程度的漏失上升，用户可根据实际项目的漏失或者过杀的既定目标进行调整。
+
 
 ## 其他
-判断NG/OK的逻辑：
+
+判断图像是NG/OK的逻辑：根据输入的json文件，判断是否有标注框。 
 
 
 
