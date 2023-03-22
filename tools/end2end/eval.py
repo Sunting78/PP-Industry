@@ -41,18 +41,18 @@ def get_args():
     parser.add_argument(
         '--input_path',
         type=str,
-        help='json path or txt path for evaluation, both of them must have isNG information',
+        help='coco format json path for evaluation',
+        required=True)
+    parser.add_argument(
+        '--pred_path',
+        type=str,
+        help='the prediction results, json format same as the output json of predict.py',
         required=True)
     parser.add_argument(
         '--image_root',
         type=str,
         default='',
         help='image root path ')
-    parser.add_argument(
-        '--pred_path',
-        type=str,
-        help='the prediction results, json format same as the output json of predict.py',
-        required=True)
     parser.add_argument(
         '--config',
         type=str,
@@ -78,7 +78,7 @@ def get_args():
     parser.add_argument(
         '--output_path',
         type=str,
-        default='./0MToutput_det/badcase/',
+        default='./output/badcase/',
         help='save path to save images and mask, default None, do not save'
     )
     return parser.parse_args()
