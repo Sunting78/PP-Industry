@@ -1,78 +1,31 @@
-# PP-Industry
+# **Industrial Inspection**
+## 简介
 
-## Introduciton
-PaddleIndustry aims to create multilingual, awesome, leading, and practical industry models and tools that help users train better models and apply them into practice.
-## Installation
-  - 1.1 Install PaddlePaddle
-  - 1.2 Install PaddleDetetion
-  - 1.3 Install PaddleSegmentation
+旨在创建基于Paddle套件的领先和实用的工业质检行业模型和工具，帮助用户训练更好的模型并将其应用于实践。
 
-## Quick Start
-### Train
+## 特性
+   * 支持工业质检检测，分割，检测+RoI分割的解决方案的训练和全流程评测；
+   * 加入工业质检中的无监督学习算法PactchCore和PaDiM；
+   * 支持数据格式转化工具，快速完成检测，分割/RoI分割任务数据格式转化；
+   * 支持质检后处理，全流程评测过杀漏失，并进行badcase可视化等；
 
-* Detection
+## 快速开始
+### 1. 环境依赖
 
-  ```bash
-  python3 tools/det/train.py -c configs/det/faster_rcnn/faster_rcnn_r101_1x_coco.yml 
-  ```
-* Segmentation
+### 2. 数据准备
+   * [准备数据集](./data/prepare_data.md)
+   * [数据集格式转换工具](./data/conver_tools.md)
+   * [EISeg 数据标注](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.7/EISeg)
 
-  ```bash
-  python3 tools/seg/train.py --config configs/seg/topformer/seaformer_tiny_ade20k_512x512_160k.yml --do_eval  --use_vdl --save_interval 1000
-  ```
+### 3. 训练/推理
+   * [无监督异常检测算法](./uad/README.md)
+   * [检测分割算法](./det_seg/train_eval.md)
+    
+### 全流程预测
+   * [准备全流程配置文件](./end2end/parse_config.md)
+   * [全流程预测](./end2end/predict.md)
 
-* Detection and RoI Segmentation
-  
-  First, deal with your data to generate coco.json format and RoI segmentation mask format.
-
-  ```bash
-  python3 tools/data_process/conver_coco.py --json_path xxx --output_path xxx
-  ```
-## Overall directory structure
-
-The overall directory structure of PaddleIndustry is introduced as follows:
-
-
-```
-PaddleIndustry
-├── configs                                 // Configuration file, you can config the model structure and modify the hyperparameters through the yml file
-│   ├── det                                 // Defect detection config files
-│   │   ├── faster_rcnn.yml                 // Training config
-│   │   ...  
-│   └── seg                                 // defect segmentation config files
-│       ├── hrnet_ocr.yml                   // hrnet config
-│       ...  
-├── deploy                                  // Depoly
-|   ...                                
-├── doc                                     // Documentation and Tutorials
-│   ...
-├── ppindustry                              // Core code
-│   ├── det                                 // detection code
-│   │   ├── datasets                        // defect data loder code
-│   │   ├── transforms                      // defect data augmentation
-│   │   └── models                          // defect models
-│   ├── seg                                 // Segmentation
-│   │   ├── datasets                        // defect data loder code
-│   │   ├── transforms                      // defect data augmentation
-│   │   └── models                          // defect models
-│   ├── postprocess                         // Post-processing
-│   │   ├── det_postprocess.py              // class post-processing
-│   │   └── seg_postprocess.py              // DB post-processing
-│   └── utils                               // utils
-├── tools
-│   ├── end2end.py                          // Evaluation function end-to-end
-│   ├── export_model.py                     // Export inference model
-│   ├── det                                 // Detection train predict and inference 
-│   │   ├── train.py
-│   │   ├── eval.py
-│   │   ├── infer.py
-|   |   ...
-│   ├── seg                                 // Segmentation train predict and inference 
-│   │   ├── train.py
-│   │   ├── eval.py
-│   │   ├── infer.py
-|   |   ...
-├── README_ch.md                            // Chinese documentation
-├── README_en.md                            // English documentation
-├── README.md                               // Home page documentation
-├── requirements.txt                        // Requirements
+### 全流程评估（过杀/漏检）
+   * [指标评估](./end2end/eval.md)
+   * [badcase可视化分析](./end2end/eval.md)
+   * [后处理参数调优](./end2end/eval.md)
