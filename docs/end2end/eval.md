@@ -55,7 +55,39 @@ Eval INFO: Result of Instance-Level NG Evaluation:
 +----------+--------+-------+--------+--------+-------+--------+
 ```
 
-## badcase可视化
+## badcase输出
+
+badcase输出保存在`output_path`路径下，目录结构如下：
+
+```
+    output_path
+    |
+    |--overkill            # 过杀文件夹
+    |  |--Break            # 预测出的过杀类别
+    |  |  |--exp1_xxx.jpg  # 可视化的过杀图像
+    |  |  |--exp1_xxx.png
+    |  |  ...   
+    |  |--Uneven           # 预测出的过杀类别
+    |  |  |--exp1_xxx.jpg
+    |  |  |--exp1_xxx.png
+    |  ...
+    |--escape              # 漏检文件夹
+    |  |--image_level      # 图像级别漏检，图像没有任何预测结果
+    |  |  |--exp1_xxx.jpg
+    |  |  |--exp1_xxx.png
+    |  |  ...   
+    |  |--instance_level   # 实例级别漏检，图像上某个/多个缺陷漏检
+    |  |  |--Break         # 漏检的真实缺陷类别
+    |  |  |  |--exp1_xxx.jpg
+    |  |  |  |--exp1_xxx.png
+    |  |  |  ...
+    |  |  |--Uneven         # 漏检的真实缺陷类别
+    |  |  |  |--exp1_xxx.jpg
+    |  |  |  |--exp1_xxx.png
+    |  |  |  ...
+    |  |  ...
+```
+
 
 ## 后处理参数调整
 
