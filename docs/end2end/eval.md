@@ -66,6 +66,8 @@ Eval INFO: Result of Instance-Level NG Evaluation:
 |  Escape  | 15.89% |  7.69%   | 24.39% | 16.67% | 7.69% | 17.65% |
 +----------+--------+----------+--------+--------+-------+--------+
 ```
+其中，Total是NG的缺陷实例总数, NG表示预测正确的实例缺陷box/mask（通过与GT进行iou计算，从而判断这个NG预测是否是正确的位置），OK表示该缺陷实例没有任何的可匹配（大于iou_theshold）的NG预测box/mask。`Escape=OK/Total` 
+
 
 ## badcase可视化输出
 
