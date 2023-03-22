@@ -1,4 +1,4 @@
-**Industrial Inspection**
+# **Industrial Inspection**
 ## 简介
 
 旨在创建基于Paddle套件的领先和实用的工业质检行业模型和工具，帮助用户训练更好的模型并将其应用于实践。
@@ -17,14 +17,14 @@
    * [数据集格式转换工具](./data/conver_tools.md)
    * [EISeg 数据标注](https://github.com/PaddlePaddle/PaddleSeg/tree/release/2.7/EISeg)
 
-### 训练/推理
-    * [无监督异常检测算法](./uad/README.md)
-    * 检测算法
-    * 分割算法
+### 3. 训练/推理
+   * [无监督异常检测算法](./uad/README.md)
+   * 检测算法
+   * 分割算法
     
 ### 全流程预测
-    * [准备全流程配置文件](./end2end/parse_config.md)
-    * [全流程预测](./end2end/predict.md)
+   * [准备全流程配置文件](./end2end/parse_config.md)
+   * [全流程预测](./end2end/predict.md)
 
 ### 全流程指标评测（过杀/漏检）
     * 全流程指标评估

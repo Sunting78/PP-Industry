@@ -4,9 +4,9 @@
 
 全流程配置文件保存在`./configs/end2end/`目录下, 提供了三种常用的工业质检PPL，分别是：
 
-    * [检测+后处理](../../configs/end2end/e2e_det.yml)
-    * [分割+后处理](../../configs/end2end/e2e_seg.yml)
-    * [检测+RoI分割+后处理](../../configs/end2end/e2e_det_RoI_seg.yml)
+* [检测+后处理](../../configs/end2end/e2e_det.yml)
+* [分割+后处理](../../configs/end2end/e2e_seg.yml)
+* [检测+RoI分割+后处理](../../configs/end2end/e2e_det_RoI_seg.yml)
 
 ## 详细解读
 
