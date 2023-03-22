@@ -19,14 +19,13 @@
 
 ### 3. 训练/推理
    * [无监督异常检测算法](./uad/README.md)
-   * 检测算法
-   * 分割算法
+   * [检测分割算法]
     
 ### 全流程预测
    * [准备全流程配置文件](./end2end/parse_config.md)
    * [全流程预测](./end2end/predict.md)
 
 ### 全流程评估（过杀/漏检）
-   * [指标评估](./end2end/predict.md)
-   * [badcase可视化分析]
-   * [后处理参数调优]
+   * [指标评估](./end2end/eval.md)
+   * [badcase可视化分析](./end2end/eval.md)
+   * [后处理参数调优](./end2end/eval.md)
