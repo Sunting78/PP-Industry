@@ -27,7 +27,7 @@ python3 tools/end2end/eval.py --input_path ./dataset/MT_dataset/val.json --pred_
 
 ## 输出结果和指标说明
 
-输出过杀指标：
+**输出过杀指标**
 ```
 Eval INFO: OK Evaluation Result:
 +----------+--------+----------+-------+-------+-------+--------+
@@ -40,7 +40,8 @@ Eval INFO: OK Evaluation Result:
 +----------+--------+----------+-------+-------+-------+--------+
 ```
 
-输出图像级别漏检指标结果：
+
+**输出图像级别漏检指标**
 ```
 Eval INFO: Result of Image-Level NG NG Evaluation:
 +--------------+-------+-----+----+--------+
@@ -50,7 +51,7 @@ Eval INFO: Result of Image-Level NG NG Evaluation:
 +--------------+-------+-----+----+--------+
 ```
 
-输出实例级别漏检指标结果：
+**输出实例级别漏检指标**
 ```
 Eval INFO: Result of Instance-Level NG Evaluation:
 +----------+--------+----------+--------+--------+-------+--------+
