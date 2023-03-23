@@ -24,7 +24,8 @@ import numpy as np
 from pycocotools.coco import COCO
 import pycocotools.mask as mask_util
 
-from ppindustry.utils.bbox_utils import adjust_bbox
+from iinspection.utils.bbox_utils import adjust_bbox
+from iinspection.utils.visualizer import polygons_to_bitmask
 
 
 def parse_args():
@@ -39,33 +40,28 @@ def parse_args():
         '--image_path',
         type=str,
         default=None,
-        help='images root path, default None if img path in json is absolute path'
-    )
+        help='images root path, default None if img path in json is absolute path')
     parser.add_argument(
         '--seg_classid',
         type=int,
         nargs='+',
         default=None,
-        help='classid to segment, default None means all classes'
-    )
+        help='classid to segment, default None means all classes')
     parser.add_argument(
         '--pad_scale',
         type=float,
         default=0.5,
-        help='the pad scale of crop img'
-    )
+        help='the pad scale of crop img')
     parser.add_argument(
         '--suffix',
         type=str,
         default='',
-        help='the gt suffix of img when save them'
-    )
+        help='the gt suffix of img when save them')
     parser.add_argument(
         '--output_path',
         type=str,
         default='./output/',
-        help='save path to save images and mask, default None, do not save'
-    )
+        help='save path to save images and mask, default None, do not save')
     return parser.parse_args()
 
 
@@ -73,15 +69,6 @@ def _mkdir_p(path):
     """Make the path exists"""
     if not osp.exists(path):
         os.makedirs(path)
-
-
-def polygons_to_bitmask(polygons, height, width):
-    if len(polygons) == 0:
-        # COCOAPI does not support empty polygons
-        return np.zeros((height, width)).astype(int)
-    rles = mask_util.frPyObjects(polygons, height, width)
-    rle = mask_util.merge(rles)
-    return mask_util.decode(rle).astype(int)
 
 
 def generate_mask_RoI(data, image_root, output_path, suffix, class_id=None, pad_scale=0.5):

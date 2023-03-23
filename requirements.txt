@@ -9,3 +9,5 @@ numpy
 PyYAML
 tqdm
 sklearn
+pandas
+Pillow

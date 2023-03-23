@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import argparse
 import os
 import os.path as osp
@@ -25,7 +26,6 @@ DEFECTS_LABELS = {'Free': 0, # free is backgroud
                   'Crack': 3,
                   'Fray': 4,
                   'Uneven': 5}
-
 TRAIN_PREFIX = ['exp0', 'exp1', 'exp2', 'exp3', 'exp4']
 VAL_PREFIX = ['exp5', 'exp6']
 
@@ -45,6 +45,9 @@ def _mkdir_p(path):
 
 
 def _create_output_path(output_path):
+    """
+    Create output directories for training and validation images and annotations.
+    """
     image_output_path = os.path.join(output_path, "images")
     anno_output_path = os.path.join(output_path, "annos")
     train_img_path = os.path.join(image_output_path, "train")
@@ -59,7 +62,9 @@ def _create_output_path(output_path):
 
 
 def convert_MT(args):
-    """Convert Magnetic-Tile dataset to paddleseg style data."""
+    """
+    Convert Magnetic-Tile dataset to paddleseg style data.
+    """
     prefix = 'MT_'
     dataset_path, output_path = args.dataset_path, args.output_path
     train_img_path, val_img_path, train_anno_path, val_anno_path =_create_output_path(output_path)
