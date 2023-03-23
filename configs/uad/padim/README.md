@@ -1,7 +1,7 @@
 # PaDiM-Anomaly-Detection-Localization
 此模型是使用Paddle复现论文: [PaDiM: a Patch Distribution Modeling Framework for Anomaly Detection and Localization](https://arxiv.org/pdf/2011.08785).
 
-![image](https://user-images.githubusercontent.com/61047836/227160636-874e4029-c017-4249-8fc0-943a07518083.png)
+![image](https://user-images.githubusercontent.com/61047836/227188224-62885b21-80fe-476c-aa81-c1181ced9626.png)
 
 PaDiM是一种基于表示的无监督异常检测算法，在训练时，输入图像通过预训练的CNN骨干网络得到不同尺度的特征图，特征图经过随机选择维度的方式进行降维后拟合多元高斯分布；在推理时，使用马氏距离衡量每个特征图位置的异常分数，分数越高表示异常区域的可能性越高。
 
