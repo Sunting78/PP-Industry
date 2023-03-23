@@ -1,6 +1,10 @@
 # STFPM
 此模型是使用Paddle复现论文: [Student-Teacher Feature Pyramid Matching for Anomaly Detection](https://arxiv.org/abs/2103.04257v3).
 
+![image](https://user-images.githubusercontent.com/61047836/227186808-0d58952e-1f1d-44ce-89f1-22a81b8e598d.png)
+
+STFPM是一种基于表示的无监督异常检测算法，由预训练的教师网络和结构相同的学生网络组成。在训练时，学生网络通过将自身特征与教师网络中的对应特征相匹配来学习正样本图像的分布；在推理时，通过比较教师网络和学生网络的各个尺度特征，差异越大，异常分数越高。
+
 ## MVTec AD数据集上的实验结果
 
 * 图像级和像素级ROCAUC指标:
