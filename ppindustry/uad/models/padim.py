@@ -14,7 +14,6 @@
 
 import paddle
 import paddle.nn as nn
-
 from paddle.vision.models.resnet import resnet18, resnet50, wide_resnet50_2
 
 from ppindustry.cvlib.workspace import register
