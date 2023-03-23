@@ -9,11 +9,14 @@
 * matplotlib
 * pandas
 * Pillow
+* cv2
 
 
 ## 2. 数据集
 
 此工具以MVTec AD数据集为例, [下载MVTec AD](https://www.mvtec.com/company/research/datasets/mvtec-ad/);
+
+如果希望使用自己的数据集, 请组织成MVTec AD数据集的格式, 标签文件为灰度图, 缺陷部分像素值为255;
 
 
 ## 3. 训练, 评估, 预测命令
@@ -36,7 +39,7 @@ Predict:
 
 ## 4. 配置文件解读
 
-无监督异常检测(uad)模型的参数可以通过YML配置文件和命令行参数两种方式指定, 如果YML文件与命令行同时指定一个参数, 命令行指定的优先级更高, YML文件主要包含以下参数:
+无监督异常检测(uad)模型的参数可以通过YML配置文件和命令行参数两种方式指定, 如果YML文件与命令行同时指定一个参数, 命令行指定的优先级更高, 以PaDiM的YML文件为例, 主要包含以下参数:
 
 ```
 # common arguments
@@ -66,4 +69,4 @@ threshold: 0.5    # 指定预测后二值化异常分数图的阈值
 
 ## 5. 集成模型
 
-目前uad工具集成了[PaDiM](../../configs/uad/padim/README.md)模型, [PatchCore](../../configs/uad/patchcore/README.md)模型;
+目前uad工具集成了[PaDiM](../../configs/uad/padim/README.md)模型, [PatchCore](../../configs/uad/patchcore/README.md)模型, [STFPM](../../configs/uad/stfpm/README.md);
