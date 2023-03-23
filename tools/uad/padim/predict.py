@@ -15,7 +15,6 @@ import matplotlib.pyplot as plt
 
 import paddle
 import paddle.nn.functional as F
-from paddle.vision import transforms as T
 
 parent_path = os.path.abspath(os.path.join(__file__, *(['..']*4)))
 sys.path.insert(0, parent_path)
@@ -65,11 +64,7 @@ def main():
     print("Testing model for {} with sigle picture".format(class_name))
 
     # build datasets
-    transform_x = T.Compose([ T.Resize(args.resize),
-                              T.CenterCrop(args.crop_size),
-                              T.ToTensor(),
-                              T.Normalize(mean=[0.485, 0.456, 0.406],
-                                          std=[0.229, 0.224, 0.225])])
+    transform_x = mvtec.MVTecDataset.get_transform_x()
     x = Image.open(args.img_path).convert('RGB')
     x = transform_x(x).unsqueeze(0)
     idx = paddle.to_tensor(sample(range(0, t_d), d))

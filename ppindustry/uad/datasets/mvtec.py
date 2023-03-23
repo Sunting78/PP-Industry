@@ -1,4 +1,7 @@
 import os
+
+import cv2
+import numpy as np
 from PIL import Image
 
 import paddle
@@ -91,14 +94,37 @@ class MVTecDataset(Dataset):
 
         return list(x), list(y), list(mask)
 
-    @staticmethod
-    def get_transform(resize=256, cropsize=256):
-        transform_x = T.Compose([T.Resize(resize),
-                                 T.CenterCrop(cropsize),
-                                 T.ToTensor(),
-                                 T.Normalize(mean=[0.485, 0.456, 0.406],
-                                             std=[0.229, 0.224, 0.225])])
-        transform_mask = T.Compose([T.Resize(resize),
-                                    T.CenterCrop(cropsize),
-                                    T.ToTensor()])
-        return transform_x, transform_mask
+    def get_transform_x(self):
+        return self.transform_x
+
+
+class MVTecDatasetSTFPM(Dataset):
+    def __init__(self, image_list, transform=None):
+        self.image_list = image_list
+        self.transform = transform
+        if self.transform is None:
+            self.transform = T.ToTensor()
+        self.dataset = self.load_dataset()
+
+    def load_dataset(self):
+        return [Image.open(p).convert('RGB') for p in self.image_list]
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        image = self.transform(self.dataset[idx])
+        return self.image_list[idx], image
+
+
+def load_gt(root, cls, resize_shape):
+    gt = []
+    gt_dir = os.path.join(root, cls, 'ground_truth')
+    sub_dirs = sorted(os.listdir(gt_dir))
+    for sb in sub_dirs:
+        for fname in sorted(os.listdir(os.path.join(gt_dir, sb))):
+            temp = cv2.imread(os.path.join(gt_dir, sb, fname), cv2.IMREAD_GRAYSCALE)
+            temp = cv2.resize(temp, (resize_shape[0],resize_shape[1])).astype(np.bool)[None, ...]
+            gt.append(temp)
+    gt = np.concatenate(gt, 0)
+    return gt

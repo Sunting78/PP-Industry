@@ -59,7 +59,7 @@ def main():
     model.eval()
 
     # build data
-    transform_x = mvtec.MVTecDataset.get_transform(resize=args.resize, cropsize=args.crop_size)[0]
+    transform_x = mvtec.MVTecDataset.get_transform_x()
     x = Image.open(args.img_path).convert('RGB')
     x = transform_x(x).unsqueeze(0)
     predict(args, model, x)

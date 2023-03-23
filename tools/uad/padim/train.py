@@ -4,10 +4,10 @@ import time
 import random
 import argparse
 import datetime
-import numpy as np
-from tqdm import tqdm
 from random import sample
 from collections import OrderedDict
+
+import numpy as np
 import pandas as pd
 
 import paddle
@@ -18,7 +18,7 @@ parent_path = os.path.abspath(os.path.join(__file__, *(['..']*4)))
 sys.path.insert(0, parent_path)
 import ppindustry.uad.datasets.mvtec as mvtec
 from ppindustry.uad.models.padim import ResNet_PaDiM
-from ppindustry.cvlib.uad_configs import *
+from ppindustry.cvlib.uad_configs import ConfigParser
 
 from val import val
 
@@ -43,7 +43,7 @@ def argsparser():
     parser.add_argument('--crop_size', type=list or tuple, default=None)
     parser.add_argument("--backbone", type=str, default=None,
                         help="backbone model arch, one of [resnet18, resnet50, wide_resnet50_2]")
-    parser.add_argument("--do_val", type=bool, default=None)
+    parser.add_argument("--do_eval", type=bool, default=None)
     parser.add_argument("--save_pic", type=bool, default=None)
 
     parser.add_argument("--save_model", type=bool, default=True)
