@@ -1,7 +1,7 @@
 # PatchCore
 此模型是使用Paddle复现论文: [Towards Total Recall in Industrial Anomaly Detection](https://arxiv.org/pdf/2106.08265v2.pdf).
 
-![image](https://user-images.githubusercontent.com/61047836/227183930-86fd8125-0285-4a9e-aa1e-00880661bca2.png)
+![image](https://user-images.githubusercontent.com/61047836/227188059-6ea90766-496d-432f-936f-f371c1f2fc0d.png)
 
 PatchCore是一种基于表示的无监督异常检测算法，在训练时，输入图像通过预训练的CNN骨干网络得到不同尺度的特征图，特征图经过KNN Greedy CoreSet 采样选取最具代表性的特征点，构建特征向量记忆池；在推理时，通过比对测试图像的特征与特征向量记忆池的距离得到每个特征位置的异常分数。
 
