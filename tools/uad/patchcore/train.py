@@ -18,9 +18,10 @@ import time
 import random
 import argparse
 import datetime
+
 import numpy as np
-from tqdm import tqdm
 import pandas as pd
+from tqdm import tqdm
 
 import paddle
 from paddle.io import DataLoader

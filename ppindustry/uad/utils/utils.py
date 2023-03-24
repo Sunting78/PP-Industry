@@ -16,11 +16,11 @@ import os
 import argparse
 
 import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
 from skimage import measure
 from sklearn.metrics import roc_curve, auc
 from tqdm import tqdm
-import matplotlib
-import matplotlib.pyplot as plt
 from skimage import morphology
 from skimage.segmentation import mark_boundaries
 

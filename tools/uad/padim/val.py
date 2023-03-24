@@ -22,6 +22,8 @@ from collections import OrderedDict
 
 import numpy as np
 import pandas as pd
+import matplotlib
+import matplotlib.pyplot as plt
 from tqdm import tqdm
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
@@ -30,8 +32,6 @@ from scipy.spatial.distance import mahalanobis
 from scipy.ndimage import gaussian_filter
 from skimage import morphology
 from skimage.segmentation import mark_boundaries
-import matplotlib
-import matplotlib.pyplot as plt
 
 import paddle
 import paddle.nn.functional as F

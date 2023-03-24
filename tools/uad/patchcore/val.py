@@ -17,11 +17,12 @@ import sys
 import random
 import argparse
 import datetime
+
 import numpy as np
-from tqdm import tqdm
 import pandas as pd
-from sklearn.metrics import roc_auc_score, roc_curve, precision_recall_curve
 import matplotlib.pyplot as plt
+from tqdm import tqdm
+from sklearn.metrics import roc_curve, precision_recall_curve
 
 import paddle
 from paddle.io import DataLoader

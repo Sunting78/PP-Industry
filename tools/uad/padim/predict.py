@@ -19,14 +19,14 @@ import argparse
 
 import numpy as np
 import datetime
+import matplotlib
+import matplotlib.pyplot as plt
 from PIL import Image
 from random import sample
 from collections import OrderedDict
 from scipy.ndimage import gaussian_filter
 from skimage import morphology
 from skimage.segmentation import mark_boundaries
-import matplotlib
-import matplotlib.pyplot as plt
 
 import paddle
 import paddle.nn.functional as F

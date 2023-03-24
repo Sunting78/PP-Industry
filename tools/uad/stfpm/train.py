@@ -32,7 +32,7 @@ from paddle.vision import transforms
 parent_path = os.path.abspath(os.path.join(__file__, *(['..']*4)))
 sys.path.insert(0, parent_path)
 from ppindustry.uad.models.stfpm import ResNet_MS3
-from ppindustry.uad.datasets.mvtec import MVTecDatasetSTFPM, load_gt
+from ppindustry.uad.datasets.mvtec import MVTecDatasetSTFPM
 
 from ppindustry.cvlib.uad_configs import ConfigParser
 from val import val, cal_error

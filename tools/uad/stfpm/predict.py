@@ -18,7 +18,6 @@ import random
 import datetime
 import argparse
 
-import cv2
 import numpy as np
 from PIL import Image
 
