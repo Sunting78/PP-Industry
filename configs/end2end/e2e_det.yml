@@ -1,6 +1,6 @@
 ENV:
   device: GPU
-  output: ./0MToutput_det/
+  output: ./output_det/
   save: True
   visualize: True
 PipeLine:

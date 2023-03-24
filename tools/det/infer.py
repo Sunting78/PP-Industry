@@ -31,7 +31,7 @@ from ppdet.utils.cli import ArgsParser, merge_args
 from ppdet.utils.logger import setup_logger
 
 # add python path of PaddleDetection to sys.path
-parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 2)))
+parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 3)))
 sys.path.insert(0, parent_path)
 
 warnings.filterwarnings('ignore')

@@ -24,8 +24,8 @@ import numpy as np
 from pycocotools.coco import COCO
 import pycocotools.mask as mask_util
 
-from iinspection.utils.bbox_utils import adjust_bbox
-from iinspection.utils.visualizer import polygons_to_bitmask
+from qinspector.utils.bbox_utils import adjust_bbox
+from qinspector.utils.visualizer import polygons_to_bitmask
 
 
 def parse_args():

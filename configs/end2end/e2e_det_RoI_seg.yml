@@ -1,6 +1,6 @@
 ENV:
   device: GPU
-  output_dir: ./tmp/
+  output_dir: ./output_det_roi/
   save: True
   visualize: False
 PipeLine:

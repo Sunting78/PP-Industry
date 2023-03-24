@@ -2,12 +2,12 @@ paddlepaddle-gpu>=2.2.0
 paddledet>=2.6
 paddleseg>=2.6
 visualdl>=2.2.0
+numpy
 opencv-python <= 4.6.0
 pycocotools
 scikit-image
-numpy
 PyYAML
 tqdm
 sklearn
 pandas
-Pillow
+#Pillow

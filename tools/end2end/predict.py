@@ -12,15 +12,13 @@
 # See the License for the specific language governing permissions and   
 # limitations under the License.
 
-import glob
-import math
 import os
 import sys
 parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 3)))
 sys.path.insert(0, parent_path)
 
-from ppindustry.apis.pipeline import Pipeline
-from ppindustry.cvlib.configs import ArgsParser
+from qinspector.apis.pipeline import Pipeline
+from qinspector.cvlib.configs import ArgsParser
 
 
 def argsparser():
@@ -35,7 +33,7 @@ def argsparser():
         "--input",
         type=str,
         default=None,
-        help="Path of input, suport image file, coco json file.",
+        help="suport image file and the path of image.",
         required=True)
     parser.add_argument(
         "--output_dir",
@@ -43,22 +41,16 @@ def argsparser():
         default="output",
         help="Directory of output visualization files.")
     parser.add_argument(
-        "--run_mode",
-        type=str,
-        default='paddle',
-        help="mode of running(paddle/trt_fp32/trt_fp16/trt_int8)")
-    parser.add_argument(
         "--device",
         type=str,
-        default='CPU',
-        help="Choose the device you want to run, it can be: CPU/GPU/XPU, default is CPU."
+        default='GPU',
+        help="Choose the device you want to run, it can be: CPU/GPU/XPU, default is GPU."
     )
-    return parser
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
-    parser = argsparser()
-    args = parser.parse_args()
+    args = argsparser()
     inputs = os.path.abspath(args.input)
     pipeline = Pipeline(args)
     result = pipeline.run(inputs)

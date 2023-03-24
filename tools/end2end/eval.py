@@ -14,9 +14,9 @@
 
 import argparse
 import json
+import sys
 import os
 import os.path as osp
-import sys
 from collections import defaultdict
 
 parent_path = os.path.abspath(os.path.join(__file__, *(['..'] * 3)))
@@ -25,12 +25,13 @@ sys.path.insert(0, parent_path)
 import prettytable as pt
 from pycocotools.coco import COCO
 
-from ppindustry.cvlib.configs import ConfigParser
-from ppindustry.ops.postprocess import PostProcess
-from ppindustry.utils.logger import setup_logger
-from ppindustry.utils.data_dict import post_process_image_info
-from ppindustry.utils.bbox_utils import iou_one_to_multiple 
-from ppindustry.utils.visualizer import show_result, draw_one_bboxes
+from qinspector.cvlib.configs import ConfigParser
+from qinspector.ops.postprocess import PostProcess
+from qinspector.utils.logger import setup_logger
+from qinspector.utils.data_dict import post_process_image_info
+from qinspector.utils.bbox_utils import iou_one_to_multiple 
+from qinspector.utils.visualizer import show_result, draw_one_bboxes
+
 logger = setup_logger('Eval')
 
 
