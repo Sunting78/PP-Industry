@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import argparse
 import os
 import os.path as osp
@@ -25,7 +26,6 @@ DEFECTS_LABELS = {'Blowhole': 1,
                   'Fray': 4,
                   'Free': 5,
                   'Uneven': 6}
-
 TRAIN_PREFIX = ['exp0', 'exp1', 'exp2', 'exp3', 'exp4']
 VAL_PREFIX = ['exp5', 'exp6']
 
@@ -91,7 +91,8 @@ def convert_MT(args):
                 raise ValueError('img name can not match any train or val prefix.')
     f_train.close()
     f_val.close()
-            
+
+
 if __name__ == "__main__":
     args = parse_args()
     convert_MT(args)

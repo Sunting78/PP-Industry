@@ -1,4 +1,4 @@
-# Copyright (c) 2022 PaddlePaddle Authors. All Rights Reserved. 
+# Copyright (c) 2023 PaddlePaddle Authors. All Rights Reserved. 
 #   
 # Licensed under the Apache License, Version 2.0 (the "License");   
 # you may not use this file except in compliance with the License.  
@@ -12,18 +12,7 @@
 # See the License for the specific language governing permissions and   
 # limitations under the License.
 
-import math
-import os
-from collections import defaultdict
-
-import numpy as np
-
-import paddle
-import ppindustry
-from ppindustry.cvlib.workspace import create
-from ppindustry.ops import *
-from ppindustry.utils.data_dict import post_process_image_info
-from ppindustry.utils.helper import gen_input_name, get_output_keys
+from qinspector.cvlib.workspace import create
 
 
 class Builder(object):
@@ -45,43 +34,38 @@ class Builder(object):
             op = create(op_arch, op_cfg, env_cfg)
             self.op_name2op[op_arch] = op
 
-
-    def update(self, results, input):
-        """"update model results"""
-        image_to_info = {}
+    def init_output(self, input):
+        output = dict()
         for data_path in input:
-            image_to_info[data_path] = {'pred': []}
-        for pred in results:
+            output[data_path] = {'pred': []}
+        return output
+
+    def update_output(self, input, output):
+        for pred in input:
             image_path = pred['image_path']
             pred.pop("image_path")
             pred.pop("image_id") if "image_id" in pred.keys() else None
-            if  image_path not in image_to_info.keys():
-                image_to_info[image_path]= {'pred':[pred]}
-            
-            else:
-                image_to_info[image_path]['pred'].append(pred)
-            
-            #if 'isNG' not in image_to_info[image_path].keys() or image_to_info[image_path]['isNG'] == 0:
-            #    image_to_info[image_path]['isNG'] = pred['isNG']
+            output[image_path]['pred'].append(pred)
+        return output
 
-            #if not image_to_info[image_path].get('isNG', 0):
-            #    image_to_info[image_path]['isNG'] = pred['isNG']
+    def get_final_output(self, input, output, last_op=None):
+        if last_op != 'PostProcess':
+            input = self.update_output(input, output)
+        for _, img_info in input.items():
+            preds = img_info['pred']
+            img_info['isNG']  = 0
+            for pred in preds:
+                if pred['isNG'] == 1:
+                    img_info['isNG'] = 1
+                    break
+        return input
 
-        return image_to_info
-
-
-
-    def run(self, input, frame_id=-1):
-        image_list = input
+    def run(self, input):
+        output = self.init_output(input)
         # execute each operator according to toposort order
         for op_name, op in self.op_name2op.items():
             if op_name == 'PostProcess':
-                input = self.update(result, image_list)
-            result = op(input)
-            input = result
-        
-        post_process_image_info(result)
+                input = self.update_output(input, output)
+            input = op(input)
 
-            
-        print(result)
-        return result
+        return self.get_final_output(input, output, last_op=op_name)

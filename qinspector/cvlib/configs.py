@@ -12,21 +12,14 @@
 # See the License for the specific language governing permissions and   
 # limitations under the License.
 
-import collections
 import copy
-import math
-import os
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
-from collections import defaultdict
 from collections.abc import Mapping, Sequence
 
-import numpy as np
 import yaml
 
-import paddle
-import ppindustry
-from ppindustry.ops import *
-from ppindustry.utils.logger import setup_logger
+from qinspector.ops import *
+from qinspector.utils.logger import setup_logger
 
 logger = setup_logger('config')
 
@@ -74,7 +67,6 @@ class ConfigParser(object):
             cfg = yaml.safe_load(f)
         print('args: ', args)
         self.model_cfg, self.env_cfg = self.merge_cfg(args, cfg)
-        #self.check_cfg()
 
     def merge_cfg(self, args, cfg):
         env_cfg = cfg['ENV']
@@ -109,7 +101,7 @@ class ConfigParser(object):
             if k not in env_cfg:
                 env_cfg[k] = v
         env_cfg = merge(env_cfg, args_dict)
-        print('debug env_cfg: ', env_cfg)
+        print('env_cfg: ', env_cfg)
         if 'opt' in args_dict.keys() and args_dict['opt']:
             opt_dict = args_dict['opt']
             if opt_dict.get('ENV', None):
@@ -118,33 +110,6 @@ class ConfigParser(object):
                 model_cfg = merge_opt(model_cfg, opt_dict['PipeLine'])
 
         return model_cfg, env_cfg
-
-    def check_cfg(self):
-        unique_name = set()
-        unique_name.add('input')
-        op_list = ppindustry.ops.__all__
-        for model in self.model_cfg:
-            model_name = list(model.keys())[0]
-            model_dict = list(model.values())[0]
-            # check the name and last_ops is legal
-            if 'name' not in model_dict:
-                raise ValueError(
-                    'Missing name field in {} model config'.format(model_name))
-            inputs = model_dict['Inputs']
-            for input in inputs:
-                input_str = input.split('.')
-                assert len(
-                    input_str
-                ) > 1, 'The Inputs name should be in format of {last_op_name}.{last_op_output_name}, but receive {} in {} model config'.format(
-                    input, model_name)
-                last_op = input.splict('.')[0]
-                assert last_op in unique_name, 'The last_op {} in {} model config is not exist.'.format(
-                    last_op, model_name)
-            unique_name.add(model_dict['name'])
-
-        device = self.env_cfg.get("device", "CPU")
-        assert device.upper() in ['CPU', 'GPU', 'XPU'
-                                  ], "device should be CPU, GPU or XPU"
 
     def parse(self):
         return self.model_cfg, self.env_cfg

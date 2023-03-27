@@ -35,7 +35,7 @@ class Predictor(Trainer):
                 draw_threshold=0.5,
                 output_dir='output',
                 save_results=False,
-                visualize=True):
+                visualize=False):
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
@@ -72,65 +72,13 @@ class Predictor(Trainer):
                     outs[key] = value.numpy()
             #outs['im_path'] = imid2path[int(outs['im_id'])]
             infer_res = self.get_det_res(
-                outs['bbox'], outs['bbox_num'], outs['im_id'], clsid2catid, imid2path, score_thresh=score_thresh)
+                outs['bbox'], outs['bbox_num'], outs['im_id'], clsid2catid, catid2name, imid2path, score_thresh=score_thresh)
 
             results.extend(infer_res)
 
-        if visualize:
-            for outs in results:
-                batch_res = get_infer_results(outs, clsid2catid)
-                bbox_num = outs['bbox_num']
-                start = 0
-                for i, im_id in enumerate(outs['im_id']):
-                    image_path = imid2path[int(im_id)]
-                    image = Image.open(image_path).convert('RGB')
-                    image = ImageOps.exif_transpose(image)
-                    self.status['original_image'] = np.array(image.copy())
-
-                    end = start + bbox_num[i]
-                    bbox_res = batch_res['bbox'][start:end] \
-                            if 'bbox' in batch_res else None
-
-                for outs in results:
-                    batch_res = get_infer_results(outs, clsid2catid)
-                    bbox_num = outs['bbox_num']
-                    
-                    start = 0
-                    for i, im_id in enumerate(outs['im_id']):
-                        image_path = imid2path[int(im_id)]
-                        image = Image.open(image_path).convert('RGB')
-                        image = ImageOps.exif_transpose(image)
-                        self.status['original_image'] = np.array(image.copy())
-
-                        end = start + bbox_num[i]
-                        bbox_res = batch_res['bbox'][start:end] \
-                                if 'bbox' in batch_res else None
-                        mask_res = batch_res['mask'][start:end] \
-                                if 'mask' in batch_res else None
-                        segm_res = batch_res['segm'][start:end] \
-                                if 'segm' in batch_res else None
-                        keypoint_res = batch_res['keypoint'][start:end] \
-                                if 'keypoint' in batch_res else None
-                        pose3d_res = batch_res['pose3d'][start:end] \
-                                if 'pose3d' in batch_res else None
-                        image = visualize_results(
-                            image, bbox_res, mask_res, segm_res, keypoint_res,
-                            pose3d_res, int(im_id), catid2name, draw_threshold)
-                        self.status['result_image'] = np.array(image.copy())
-                        if self._compose_callback:
-                            self._compose_callback.on_step_end(self.status)
-                        # save image with detection
-                        save_name = self._get_save_image_name(output_dir,
-                                                            image_path)
-                        logger.info("Detection bbox results save in {}".format(
-                            save_name))
-                        image.save(save_name, quality=95)
-
-                        start = end
-
         return results
 
-    def get_det_res(self, bboxes, bbox_nums, image_id, label_to_cat_id_map, imid2path, bias=0, score_thresh=0.0):
+    def get_det_res(self, bboxes, bbox_nums, image_id, label_to_cat_id_map, catid2name, imid2path, bias=0, score_thresh=0.0):
         det_res = []
         k = 0
         for i in range(len(bbox_nums)):
@@ -153,8 +101,10 @@ class Predictor(Trainer):
                     'image_id': cur_image_id,
                     'image_path': cur_image_path,
                     'category_id': category_id,
+                    'category_name': catid2name[category_id],
                     'bbox': bbox,
-                    'score': score
+                    'score': score,
+                    'isNG': 1
                 }
                 det_res.append(dt_res)
         return det_res

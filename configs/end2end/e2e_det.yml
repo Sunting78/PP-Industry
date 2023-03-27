@@ -1,16 +1,18 @@
 ENV:
   device: GPU
-  output: ./tmp/
+  output: ./output_det/
   save: True
-  visualize: False
+  visualize: True
 PipeLine:
   - Detection:
       config_path: ./configs/det/hrnet/faster_rcnn_hrnetv2p_w18_1x_defect.yml
-      model_path: ./output/faster_rcnn_hrnetv2p_w18_1x_defect/model_final.pdparams
-      #classes: [1]
+      model_path: ./output/faster_rcnn_hrnetv2p_w18_1x_defect/best_model.pdparams
       score_threshold: 0.01
   - PostProcess:
       - JudgeDetByScores:
-          score_threshold: {1: 0.1} #{class_id or name: threshold}
+          score_threshold: 
+            1: 0.2
+            2: 0.0
+            5: 0.8
       - JudgeByLengthWidth:
-          len_thresh: 10 # smaller than it is OK sample
+          len_thresh: 0 # smaller than it is OK sample

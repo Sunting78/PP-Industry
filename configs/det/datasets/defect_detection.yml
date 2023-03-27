@@ -1,10 +1,8 @@
 metric: COCO
-num_classes: 1
+num_classes: 5
 
 TrainDataset:
   name: COCODataSet
-  #image_dir: 
-  #anno_path: ./dataset/kolektor2/train.json
   anno_path: ./dataset/MT_dataset/train.json
   dataset_dir: ./
   data_fields: ['image', 'gt_bbox', 'gt_class', 'is_crowd']
@@ -12,7 +10,6 @@ TrainDataset:
 
 EvalDataset:
   name: COCODataSet
-  #image_dir: val2017
   anno_path: ./dataset/MT_dataset/val.json
   dataset_dir: ./
   allow_empty: true

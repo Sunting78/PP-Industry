@@ -7,7 +7,7 @@ _BASE_: [
 ]
 
 weights: output/faster_rcnn_hrnetv2p_w18_1x_coco/model_final
-epoch: 12
+epoch: 36
 
 LearningRate:
   base_lr: 0.02
@@ -20,12 +20,11 @@ LearningRate:
     steps: 1000
 
 TrainReader:
-  batch_size: 32
+  batch_size: 16
 
 BBoxPostProcess:
   decode: 
     name: RCNNBox
-    #score_thresh: 0.01
   nms:
     name: MultiClassNMS
     keep_top_k: 100

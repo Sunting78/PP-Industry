@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and   
 # limitations under the License.
 
-import os
-
 __all__ = ['register', 'create']
 
 global_config = dict()

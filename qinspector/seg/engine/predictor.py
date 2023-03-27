@@ -11,10 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import os
 
 import numpy as np
-
 import cv2
 import paddle
 from paddleseg import utils
@@ -23,6 +23,7 @@ from paddleseg.core.predict import mkdir, partition_list
 from paddleseg.cvlibs import Config
 from paddleseg.transforms import Compose
 from paddleseg.utils import progbar, visualize
+
 from ppindustry.utils.logger import setup_logger
 
 logger = setup_logger('SegPredictor')
@@ -58,6 +59,12 @@ class SegPredictor(object):
             if cls_id == 0:
                 continue # skip background
             class_map = np.equal(pred, cls_id).astype(np.uint8)
+            y_indices, x_indices = np.nonzero(class_map)
+            y_min = int(y_indices.min())
+            y_max = int(y_indices.max())
+            x_min = int(x_indices.min())
+            x_max = int(x_indices.max())
+            
             contours, _ = cv2.findContours(class_map, cv2.RETR_LIST,
                                         cv2.CHAIN_APPROX_SIMPLE)
             polygon = []
@@ -65,13 +72,16 @@ class SegPredictor(object):
                 if len(contours[j]) <= 4:
                     continue
                 polygon.append(contours[j].flatten().tolist())
-            
+
+
             result.append({
                 'image_path': img_data,
                 'category_id': int(cls_id),
+                'bbox': [x_min, y_min, x_max - x_min, y_max - y_min],
                 #'mask': class_map,
                 'polygon': polygon,
                 'area': int(np.sum(class_map > 0)),
+                'isNG': 1
             })
         
 
@@ -109,6 +119,7 @@ class SegPredictor(object):
             #img_data.pop('crop_box', None)
             img_data['polygon'] = polygon
             img_data['area'] =  int(np.sum(class_map > 0))
+            img_data['isNG'] = 1
 
             result.append(img_data)
 
