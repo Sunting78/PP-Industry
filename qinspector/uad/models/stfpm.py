@@ -16,7 +16,7 @@ import paddle
 import paddle.nn as nn
 from paddle.vision.models.resnet import resnet18, resnet34, resnet50, resnet101
 
-from ppindustry.cvlib.workspace import register
+from qinspector.cvlib.workspace import register
 
 
 models = {"resnet18": resnet18, "resnet34": resnet34,

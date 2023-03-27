@@ -21,9 +21,9 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle.vision.models.resnet import resnet18, resnet50, wide_resnet50_2
 
-from ppindustry.cvlib.workspace import register
-from ppindustry.uad.utils.k_center_greedy import KCenterGreedy
-from ppindustry.uad.utils.utils import cdist, cholesky_inverse, mahalanobis, mahalanobis_einsum, orthogonal, svd_orthogonal
+from qinspector.cvlib.workspace import register
+from qinspector.uad.utils.k_center_greedy import KCenterGreedy
+from qinspector.uad.utils.utils import cdist, cholesky_inverse, mahalanobis, mahalanobis_einsum, orthogonal, svd_orthogonal
 
 
 models = {"resnet18": resnet18, "resnet50": resnet50,

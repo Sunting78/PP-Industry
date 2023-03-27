@@ -25,10 +25,10 @@ import paddle
 
 parent_path = os.path.abspath(os.path.join(__file__, *(['..']*4)))
 sys.path.insert(0, parent_path)
-import ppindustry.uad.datasets.mvtec as mvtec
-from ppindustry.uad.models.patchcore import get_model
-from ppindustry.uad.utils.utils import plot_fig, str2bool
-from ppindustry.cvlib.uad_configs import ConfigParser
+import qinspector.uad.datasets.mvtec as mvtec
+from qinspector.uad.models.patchcore import get_model
+from qinspector.uad.utils.utils import plot_fig, str2bool
+from qinspector.cvlib.uad_configs import ConfigParser
 
 
 def argsparser():

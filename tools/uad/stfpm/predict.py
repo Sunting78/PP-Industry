@@ -27,9 +27,9 @@ from paddle.vision import transforms
 
 parent_path = os.path.abspath(os.path.join(__file__, *(['..']*4)))
 sys.path.insert(0, parent_path)
-from ppindustry.uad.models.stfpm import ResNet_MS3
-from ppindustry.cvlib.uad_configs import ConfigParser
-from ppindustry.uad.utils.utils import plot_fig
+from qinspector.uad.models.stfpm import ResNet_MS3
+from qinspector.cvlib.uad_configs import ConfigParser
+from qinspector.uad.utils.utils import plot_fig
 
 
 def argsparser():

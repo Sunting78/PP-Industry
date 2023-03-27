@@ -15,7 +15,7 @@
 import yaml
 
 from collections import namedtuple
-from ppindustry.utils.logger import setup_logger
+from qinspector.utils.logger import setup_logger
 
 
 logger = setup_logger('config')

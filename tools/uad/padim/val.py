@@ -39,9 +39,9 @@ from paddle.io import DataLoader
 
 parent_path = os.path.abspath(os.path.join(__file__, *(['..']*4)))
 sys.path.insert(0, parent_path)
-import ppindustry.uad.datasets.mvtec as mvtec
-from ppindustry.uad.models.padim import ResNet_PaDiM
-from ppindustry.cvlib.uad_configs import *
+import qinspector.uad.datasets.mvtec as mvtec
+from qinspector.uad.models.padim import ResNet_PaDiM
+from qinspector.cvlib.uad_configs import *
 
 
 textures = ['carpet', 'grid', 'leather', 'tile', 'wood']

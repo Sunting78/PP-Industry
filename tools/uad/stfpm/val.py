@@ -29,10 +29,10 @@ from paddle.vision import transforms
 
 parent_path = os.path.abspath(os.path.join(__file__, *(['..']*4)))
 sys.path.insert(0, parent_path)
-from ppindustry.uad.models.stfpm import ResNet_MS3
-from ppindustry.uad.datasets.mvtec import MVTecDatasetSTFPM, load_gt
-from ppindustry.uad.utils.utils import eval_metric
-from ppindustry.cvlib.uad_configs import ConfigParser
+from qinspector.uad.models.stfpm import ResNet_MS3
+from qinspector.uad.datasets.mvtec import MVTecDatasetSTFPM, load_gt
+from qinspector.uad.utils.utils import eval_metric
+from qinspector.cvlib.uad_configs import ConfigParser
 
 
 def argsparser():

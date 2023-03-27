@@ -22,7 +22,7 @@ import paddle
 from paddle.io import Dataset
 from paddle.vision import transforms as T
 
-from ppindustry.cvlib.workspace import register
+from qinspector.cvlib.workspace import register
 
 
 textures = ['carpet', 'grid', 'leather', 'tile', 'wood']
